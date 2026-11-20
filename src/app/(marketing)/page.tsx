@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Check, X } from "lucide-react";
-import { Halftone, Marquee, OrbitLines, Sticker } from "@/components/cosmos/Ornament";
+import { LandingPreview } from "@/components/marketing/LandingPreview";
 import { HeroBackdrop } from "@/components/cosmos/HeroBackdrop";
 import { Wordmark, Orb } from "@/components/cosmos/Orb";
 import { buttonVariants } from "@/components/ui/Button";
@@ -10,16 +10,23 @@ import { cn } from "@/lib/cn";
 export const dynamic = "force-dynamic";
 
 const STEPS = [
-  { n: "01", t: "Open", d: "Make a Space with a name and a PIN. Open it in any browser, on any device. No install." },
-  { n: "02", t: "Paste", d: "Ctrl+V anywhere in the Space. Text, an AI answer, a screenshot, a file. It beams up." },
-  { n: "03", t: "Catch", d: "It lands on your other device in a blink. One click (or one key) and it's on your clipboard." },
+  { n: "01", t: "Open", d: "Make a Space with a name and a PIN, and open it in any browser on any device. Nothing to install." },
+  { n: "02", t: "Paste", d: "Press Ctrl or Command V anywhere in the Space. Text, an AI answer, a screenshot or a file goes up." },
+  { n: "03", t: "Catch", d: "It lands on your other device within seconds. One click, or the C key, and it is on your clipboard." },
 ];
 
 const USES = [
-  { t: "AI answer → work laptop", d: "Get the response where the AI isn't allowed. Mind your org's rules.", c: "var(--nebula)", r: -2 },
-  { t: "Phone photo → desktop", d: "No cable, no email, no ecosystem lock-in.", c: "var(--ion)", r: 1.5 },
-  { t: "Snippet → meeting PC", d: "The one command you need, right now.", c: "var(--flare)", r: -1 },
-  { t: "Screenshot → anywhere", d: "Paste it in. It's an image on the other side.", c: "var(--aurora)", r: 2 },
+  { t: "An AI answer, on the laptop that can't reach the AI", d: "Mind your organization's rules about what you may move." },
+  { t: "A phone photo, on your desktop", d: "No cable, no email, no matching ecosystem." },
+  { t: "A command, on the meeting-room PC", d: "The one line you need, right now." },
+  { t: "A screenshot, anywhere", d: "Paste it in and it arrives as an image." },
+];
+
+const TALK: Array<[string, string]> = [
+  ["Yours only", "Spaces belong to your account. There is no sharing with other people and no public links."],
+  ["Short-lived", "Drops burn after 1 hour, 24 hours or 7 days. You pick, and files are deleted for real."],
+  ["Not a workaround", "If this is a work computer, your organization's data policies still apply."],
+  ["Not end-to-end encrypted yet", "That is on the roadmap. Don't send secrets you would not send through any hosted service."],
 ];
 
 const COMPARE: Array<[string, boolean, boolean]> = [
@@ -50,21 +57,14 @@ export default async function Landing() {
       </header>
 
       <main id="main">
-        <section className="relative mx-auto max-w-[1280px] px-4 pb-24 pt-10 sm:px-8 sm:pt-20">
-          <Halftone size={300} color="var(--ion)" className="absolute -left-24 top-[28rem] hidden opacity-50 md:block" />
-          <OrbitLines className="absolute left-1/2 top-24 w-[120%] -translate-x-1/2" />
+        <section className="relative mx-auto max-w-[1280px] px-4 pb-24 pt-10 sm:px-8 sm:pb-32 sm:pt-20">
           <div className="relative">
-            <div className="mb-6 flex flex-wrap gap-3">
-              <Sticker rotate={-5}>No install</Sticker>
-              <Sticker rotate={3} color="var(--aurora)">PIN locked</Sticker>
-              <Sticker rotate={-2} color="var(--ion)">Burns after 24h</Sticker>
-            </div>
-            <h1 className="fs-mega font-display text-echo" data-echo="Throw it">
+            <h1 className="fs-mega font-display">
               Throw it <span className="font-accent text-grad !normal-case">into space.</span>
             </h1>
-            <p className="font-display mt-4 text-[clamp(1.1rem,3vw,2rem)] font-extrabold uppercase tracking-tight text-moondust">Catch it on the other side.</p>
+            <p className="font-display mt-5 text-[clamp(1.1rem,2.6vw,1.75rem)] font-extrabold uppercase tracking-tight text-moondust">Catch it on the other side.</p>
             <p className="mt-6 max-w-xl text-lg text-moondust">
-              A private floating Space between your own devices. Paste on your work laptop, copy on your personal one. Text, AI answers, screenshots, files. Nothing to install, no emailing yourself.
+              A private floating Space between your own devices. Paste on your work laptop, copy on your personal one. Text, AI answers, screenshots and files, with nothing to install.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
               <Link href={who ? "/spaces" : "/sign-up"} className={buttonVariants({ size: "xl" })}>
@@ -72,83 +72,119 @@ export default async function Landing() {
               </Link>
               <Link href="#how" className={buttonVariants({ variant: "secondary", size: "xl" })}>How it works</Link>
             </div>
+            <p className="font-mono-cargo mt-8 text-sm text-dim">Free to start. Drops burn after 1 hour, 24 hours or 7 days, your choice.</p>
           </div>
         </section>
 
-        <div className="relative z-10 py-8"><Marquee items={["Paste here", "Copy there", "No email-to-self", "No install", "PIN locked", "Burns on its own"]} /></div>
-
-        <section id="how" className="mx-auto max-w-[1280px] px-4 py-24 sm:px-8">
-          <h2 className="fs-display font-display mb-12">Three moves.</h2>
-          <ol className="grid gap-6 md:grid-cols-3">
-            {STEPS.map((s, i) => (
-              <li key={s.n} className="cargo cargo-paper relative p-6" style={{ transform: `rotate(${[-1.2, 0.8, -0.6][i]}deg)`, ["--space-accent" as string]: ["var(--nebula)", "var(--plasma)", "var(--ion)"][i] }}>
-                <span aria-hidden="true" className="font-display text-6xl font-black text-ink/60">{s.n}</span>
-                <h3 className="font-display -mt-2 text-3xl font-extrabold">{s.t}</h3>
-                <p className="mt-3 text-ink/80">{s.d}</p>
-              </li>
-            ))}
-          </ol>
+        <section className="border-t border-line">
+          <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-8 sm:py-20">
+            <SectionHead kicker="The product" title="This is a Space." />
+            <p className="mt-4 max-w-xl text-moondust">
+              Every Drop shows where it came from and when it burns. One tap copies it. These are examples, and they really are copyable.
+            </p>
+            <div className="mt-10"><LandingPreview /></div>
+          </div>
         </section>
 
-        <section className="mx-auto max-w-[1280px] px-4 py-16 sm:px-8">
-          <h2 className="fs-display font-display mb-10">Made for <span className="font-accent text-grad">two-laptop</span> people.</h2>
-          <ul className="grid gap-6 sm:grid-cols-2">
-            {USES.map((u) => (
-              <li key={u.t} className="hull relative p-6" style={{ transform: `rotate(${u.r}deg)` }}>
-                <span className="sticker absolute -top-3 right-4" style={{ background: u.c }}>use case</span>
-                <h3 className="font-display text-xl font-extrabold">{u.t}</h3>
-                <p className="mt-2 text-moondust">{u.d}</p>
-              </li>
-            ))}
-          </ul>
+        <section id="how" className="border-t border-line">
+          <div className="mx-auto grid max-w-[1100px] gap-10 px-4 py-16 sm:px-8 sm:py-20 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+            <SectionHead kicker="How it works" title="Open. Paste. Catch." />
+            <ol className="divide-y divide-line border-y border-line">
+              {STEPS.map((s) => (
+                <li key={s.n} className="grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 py-5">
+                  <span className="font-mono-cargo pt-1 text-sm text-dim">{s.n}</span>
+                  <div>
+                    <h3 className="font-display text-xl font-extrabold">{s.t}</h3>
+                    <p className="mt-1 text-moondust">{s.d}</p>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 py-24 sm:px-8">
-          <h2 className="fs-display font-display mb-8">Why not email yourself?</h2>
-          <div className="panel overflow-hidden">
-            <table className="w-full text-left text-sm sm:text-base">
+        <section className="border-t border-line">
+          <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-8 sm:py-20">
+            <SectionHead kicker="Who it's for" title="People with two laptops." />
+            <dl className="mt-12 grid gap-x-16 gap-y-10 sm:grid-cols-2">
+              {USES.map((u) => (
+                <div key={u.t}>
+                  <dt className="font-accent text-3xl leading-tight sm:text-4xl">{u.t}</dt>
+                  <dd className="mt-3 text-moondust">{u.d}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
+        </section>
+
+        <section className="border-t border-line">
+          <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-8 sm:py-20">
+            <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
+              <SectionHead kicker="Compared" title="Why not email yourself?" />
+            <table className="w-full text-left">
               <thead>
-                <tr className="border-b border-line text-moondust">
-                  <th className="p-4 font-bold"><span className="sr-only">Feature</span></th>
-                  <th className="p-4 text-center"><Orb size={26} className="mx-auto" /><span className="sr-only">Rezorb</span></th>
-                  <th className="p-4 text-center fs-micro">Email / Teams</th>
+                <tr className="border-b border-line text-sm text-moondust">
+                  <th scope="col" className="py-3 pr-4 font-medium">What you need</th>
+                  <th scope="col" className="w-16 py-3 text-center font-medium sm:w-28">Rezorb</th>
+                  <th scope="col" className="w-16 py-3 text-center font-medium sm:w-28">Email</th>
                 </tr>
               </thead>
               <tbody>
                 {COMPARE.map(([k, a, b]) => (
-                  <tr key={k} className="border-b border-line last:border-0">
-                    <th scope="row" className="p-4 font-medium">{k}</th>
+                  <tr key={k} className="border-b border-line">
+                    <th scope="row" className="py-4 pr-4 font-normal">{k}</th>
                     {[a, b].map((v, i) => (
-                      <td key={i} className="p-4 text-center">
-                        {v ? <Check className="mx-auto text-aurora" aria-label="Yes" /> : <X className="mx-auto text-redshift" aria-label="No" />}
+                      <td key={i} className="py-4 text-center">
+                        {v ? <Check className="mx-auto text-aurora" size={20} aria-label="Yes" /> : <X className="mx-auto text-dim" size={20} aria-label="No" />}
                       </td>
                     ))}
                   </tr>
                 ))}
               </tbody>
             </table>
+            </div>
           </div>
         </section>
 
-        <section className="mx-auto max-w-3xl px-4 pb-24 sm:px-8">
-          <h2 className="fs-display font-display mb-6">Straight talk.</h2>
-          <ul className="space-y-3 text-moondust">
-            <li><strong className="text-starlight">Yours only.</strong> Spaces belong to your account. There&apos;s no sharing with other people, and no public links.</li>
-            <li><strong className="text-starlight">Short-lived.</strong> Drops burn after 1 hour, 24 hours or 7 days. You pick. Files are deleted for real.</li>
-            <li><strong className="text-starlight">Not for getting around rules.</strong> If this is a work computer, your organization&apos;s data policies still apply.</li>
-            <li><strong className="text-starlight">Not end-to-end encrypted yet.</strong> That&apos;s on the roadmap. Don&apos;t send secrets you wouldn&apos;t send through any hosted service.</li>
-          </ul>
+        <section className="border-t border-line">
+          <div className="mx-auto max-w-[1100px] px-4 py-16 sm:px-8 sm:py-20">
+            <SectionHead small kicker="Straight talk" title="What it is and isn't." />
+            <dl className="mt-8 max-w-3xl divide-y divide-line border-y border-line">
+              {TALK.map(([k, v]) => (
+                <div key={k} className="grid gap-1 py-5 sm:grid-cols-[12rem_minmax(0,1fr)] sm:gap-8">
+                  <dt className="font-bold">{k}</dt>
+                  <dd className="text-moondust">{v}</dd>
+                </div>
+              ))}
+            </dl>
+          </div>
         </section>
 
-        <section className="relative mx-auto max-w-[1280px] px-4 pb-32 text-center sm:px-8">
-          <h2 className="fs-mega font-display !text-[clamp(2.5rem,9vw,7rem)]">Ready<br /><span className="font-accent text-grad !normal-case">for orbit?</span></h2>
-          <Link href={who ? "/spaces" : "/sign-up"} className={cn(buttonVariants({ size: "xl" }), "mt-10")}>{who ? "Open your Spaces" : "Make a Space"}</Link>
+        <section className="border-t border-line">
+          <div className="mx-auto flex max-w-[1100px] flex-wrap items-end justify-between gap-8 px-4 py-24 sm:px-8">
+            <h2 className="font-display max-w-xl text-4xl font-extrabold leading-tight sm:text-5xl">
+              Ready <span className="font-accent text-grad font-normal">for orbit?</span>
+            </h2>
+            <Link href={who ? "/spaces" : "/sign-up"} className={buttonVariants({ size: "xl" })}>{who ? "Open your Spaces" : "Make a Space"}</Link>
+          </div>
         </section>
       </main>
 
-      <footer className="border-t border-line px-4 py-8 text-center text-sm text-dim">
-        <Wordmark className="text-lg" /> <span className="ml-2">Throw it into space. Catch it on the other side.</span>
+      <footer className="border-t border-line px-4 py-8 text-sm text-dim">
+        <div className="mx-auto flex max-w-[1100px] flex-wrap items-center justify-between gap-4 sm:px-4">
+          <Wordmark className="text-base text-starlight" />
+          <span>Throw it into space. Catch it on the other side.</span>
+        </div>
       </footer>
+    </div>
+  );
+}
+
+function SectionHead({ kicker, title, small }: { kicker: string; title: string; small?: boolean }) {
+  return (
+    <div>
+      <p className="fs-micro text-moondust">{kicker}</p>
+      <h2 className={`font-display mt-3 font-extrabold ${small ? "text-2xl sm:text-3xl" : "text-3xl sm:text-5xl"}`}>{title}</h2>
     </div>
   );
 }
