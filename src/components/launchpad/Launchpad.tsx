@@ -1,14 +1,17 @@
 "use client";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { UnlockPanel } from "@/components/space/UnlockGate";
 import { CreateSpaceDialog } from "./CreateSpaceDialog";
-import { Halftone, OrbitLines, Coordinates } from "@/components/cosmos/Ornament";
+import { Button } from "@/components/ui/Button";
 import { relativeTime } from "@/lib/format";
 import type { SpaceDTO } from "@/lib/dto";
-import { cn } from "@/lib/cn";
 
+/**
+ * Launchpad: a utility screen, so it is composed like one. Entering a Space (the primary task) is on
+ * the left; the Spaces you already have are a plain ruled list on the right, each led by its accent.
+ */
 export function Launchpad({ initialSpaces }: { initialSpaces: SpaceDTO[] }) {
   const router = useRouter();
   const [spaces] = useState(initialSpaces);
@@ -17,16 +20,15 @@ export function Launchpad({ initialSpaces }: { initialSpaces: SpaceDTO[] }) {
   const [formKey, setFormKey] = useState(0);
 
   return (
-    <main id="main" className="mx-auto max-w-[1280px] px-4 pb-24 sm:px-8">
-      <section className="relative pt-6 sm:pt-12">
-        <Halftone size={420} color="var(--plasma)" className="absolute -right-32 -top-20 hidden opacity-60 md:block" />
-        <h1 className="fs-mega font-display text-echo relative !text-[clamp(3rem,10vw,8rem)]" data-echo="Where to?">
-          Where to?
-        </h1>
-        <div className="relative mt-8 grid gap-6 lg:grid-cols-[minmax(0,26rem)_1fr]">
-          <div className="panel relative p-6">
-            <OrbitLines className="absolute -right-10 -top-10 w-64 opacity-60" />
-            <h2 className="font-display relative mb-4 text-lg font-extrabold">Enter a Space</h2>
+    <main id="main" className="mx-auto max-w-5xl px-4 pb-24 sm:px-8">
+      <h1 className="font-display pt-4 text-4xl font-extrabold sm:pt-8 sm:text-6xl">Where to?</h1>
+
+      <div className="mt-10 grid gap-12 lg:mt-14 lg:grid-cols-[22rem_minmax(0,1fr)] lg:gap-16">
+        <section aria-labelledby="enter-h">
+          <h2 id="enter-h" className="fs-micro mb-4 text-moondust">
+            Enter a Space
+          </h2>
+          <div className="panel p-5">
             <UnlockPanel
               key={formKey}
               nameEditable
@@ -37,61 +39,55 @@ export function Launchpad({ initialSpaces }: { initialSpaces: SpaceDTO[] }) {
               }}
             />
           </div>
+        </section>
 
-          <div>
-            <h2 className="fs-micro mb-3 text-moondust">Your Spaces</h2>
-            {spaces.length === 0 ? (
-              <button onClick={() => setCreateOpen(true)} className="group grid h-full min-h-56 w-full place-items-center rounded-[var(--radius-panel)] border-2 border-dashed border-line p-8 text-center hover:border-nebula" data-testid="create-first">
-                <span>
-                  <span className="mx-auto mb-4 grid size-16 place-items-center rounded-full bg-nebula text-void transition-transform group-hover:scale-110 motion-safe:animate-bounce">
-                    <Plus size={28} />
-                  </span>
-                  <span className="font-display block text-xl font-extrabold">Launch your first Space</span>
-                  <span className="mt-1 block text-moondust">Give it a name and a PIN. That&apos;s it.</span>
-                </span>
-              </button>
-            ) : (
-              <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-                {spaces.map((s) => (
-                  <li key={s.id}>
-                    <button
-                      data-accent={s.accent}
-                      onClick={() => {
-                        setPrefill(s.name);
-                        setFormKey((k) => k + 1);
-                        if (s.unlockedHere) router.push(`/s/${s.slug}`);
-                      }}
-                      className="hull group relative flex w-full items-center gap-4 overflow-hidden p-4 text-left transition-transform hover:-translate-y-0.5"
-                      data-testid="space-card"
-                    >
-                      <span
-                        aria-hidden
-                        className="size-16 shrink-0 rounded-full border-2 border-void"
-                        style={{ backgroundImage: "radial-gradient(var(--space-accent) 30%, transparent 32%), radial-gradient(circle at 35% 30%, var(--space-accent), transparent 70%)", backgroundSize: "9px 9px, 100% 100%" }}
-                      />
-                      <span className="min-w-0">
-                        <span className="font-display block truncate text-lg font-extrabold">{s.name}</span>
-                        <span className="block text-sm text-moondust">
-                          {s.dropCount} in orbit · {relativeTime(s.lastActivityAt)}
-                        </span>
-                        <span className={cn("fs-micro mt-1 block", s.unlockedHere ? "text-aurora" : "text-dim")}>{s.unlockedHere ? "Open here" : "PIN needed"}</span>
+        <section aria-labelledby="spaces-h">
+          <h2 id="spaces-h" className="fs-micro mb-4 text-moondust">
+            Your Spaces
+          </h2>
+          {spaces.length === 0 ? (
+            <div className="border-y border-line py-10">
+              <p className="font-display text-xl font-extrabold">No Spaces yet.</p>
+              <p className="mt-2 max-w-sm text-moondust">A Space is a private place to drop things between your devices. Give it a name and a PIN.</p>
+              <Button className="mt-6" onClick={() => setCreateOpen(true)} data-testid="create-first">
+                <Plus size={16} aria-hidden /> Create your first Space
+              </Button>
+            </div>
+          ) : (
+            <ul className="divide-y divide-line border-y border-line">
+              {spaces.map((s) => (
+                <li key={s.id} data-accent={s.accent}>
+                  <button
+                    onClick={() => {
+                      setPrefill(s.name);
+                      setFormKey((k) => k + 1);
+                      if (s.unlockedHere) router.push(`/s/${s.slug}`);
+                    }}
+                    className="group flex w-full items-center gap-4 py-4 pr-2 text-left hover:bg-hull/50"
+                    data-testid="space-card"
+                  >
+                    <span aria-hidden className="h-10 w-1 shrink-0 bg-accent" />
+                    <span className="min-w-0 flex-1">
+                      <span className="block truncate text-lg font-bold">{s.name}</span>
+                      <span className="block text-sm text-moondust">
+                        {s.dropCount === 0 ? "Empty" : `${s.dropCount} in orbit`}, last active {relativeTime(s.lastActivityAt)}
                       </span>
-                      <Coordinates seed={s.id} className="absolute right-3 top-2" />
-                    </button>
-                  </li>
-                ))}
-                <li>
-                  <button onClick={() => setCreateOpen(true)} className="grid h-full min-h-24 w-full place-items-center rounded-[var(--radius-card)] border-2 border-dashed border-line p-4 hover:border-nebula" data-testid="create-space">
-                    <span className="flex items-center gap-2 font-bold">
-                      <Plus size={20} /> Create a Space
                     </span>
+                    <span className={`shrink-0 text-sm ${s.unlockedHere ? "text-aurora" : "text-dim"}`}>{s.unlockedHere ? "Open here" : "PIN needed"}</span>
+                    <ArrowRight size={18} aria-hidden className="shrink-0 text-dim transition-transform group-hover:translate-x-0.5 group-hover:text-starlight" />
                   </button>
                 </li>
-              </ul>
-            )}
-          </div>
-        </div>
-      </section>
+              ))}
+              <li>
+                <button onClick={() => setCreateOpen(true)} className="flex w-full items-center gap-3 py-4 text-left font-bold text-moondust hover:text-starlight" data-testid="create-space">
+                  <Plus size={18} aria-hidden /> New Space
+                </button>
+              </li>
+            </ul>
+          )}
+        </section>
+      </div>
+
       <CreateSpaceDialog
         open={createOpen}
         onClose={() => setCreateOpen(false)}
