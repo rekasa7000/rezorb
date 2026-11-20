@@ -53,7 +53,7 @@ export function CreateSpaceDialog({ open, onClose, onCreated }: { open: boolean;
           <legend className="fs-micro mb-2 text-moondust">New Drops live for</legend>
           <div className="flex gap-2">
             {LIFETIMES.map((l) => (
-              <button key={l} type="button" onClick={() => setLifetime(l)} aria-pressed={lifetime === l} className={cn("font-mono-cargo h-10 flex-1 rounded-xl border-2 text-sm font-semibold", lifetime === l ? "border-nebula bg-nebula/15" : "border-line")}>
+              <button key={l} type="button" onClick={() => setLifetime(l)} aria-pressed={lifetime === l} className={cn("font-mono-cargo h-10 flex-1 rounded-md border-2 text-sm font-semibold", lifetime === l ? "border-nebula bg-nebula/15" : "border-line")}>
                 {l}
               </button>
             ))}

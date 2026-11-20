@@ -22,9 +22,9 @@ export function SettingsView({ email, name }: { email: string; name: string }) {
   return (
     <main id="main" className="mx-auto max-w-3xl px-4 pb-24 sm:px-8">
       <h1 className="fs-display font-display mb-6">Settings</h1>
-      <div role="tablist" aria-label="Settings sections" className="mb-6 flex gap-1 overflow-x-auto rounded-2xl border border-line bg-hull p-1">
+      <div role="tablist" aria-label="Settings sections" className="mb-6 flex gap-1 overflow-x-auto rounded-lg border border-line bg-hull p-1">
         {TABS.map((t) => (
-          <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("h-10 flex-1 whitespace-nowrap rounded-xl px-4 text-sm font-bold", tab === t ? "bg-nebula text-void" : "text-moondust hover:text-starlight")}>
+          <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={cn("h-10 flex-1 whitespace-nowrap rounded-md px-4 text-sm font-bold", tab === t ? "bg-nebula text-void" : "text-moondust hover:text-starlight")}>
             {t}
           </button>
         ))}
@@ -117,7 +117,7 @@ function DevicesTab() {
                   </div>
                 ) : (
                   <p className="truncate font-bold">
-                    {d.label} {d.current && <span className="sticker ml-1" style={{ background: "var(--aurora)" }}>This device</span>}
+                    {d.label} {d.current && <span className="tag ml-1.5" style={{ background: "var(--aurora)" }}>This device</span>}
                   </p>
                 )}
                 <p className="text-sm text-moondust">Last seen {relativeTime(d.lastSeenAt)}</p>
@@ -143,7 +143,7 @@ function AppearanceTab() {
         <legend className="fs-micro mb-2 text-moondust">Theme</legend>
         <div className="flex gap-2">
           {themes.map((t) => (
-            <button key={t} onClick={() => set({ theme: t })} aria-pressed={theme === t} className={cn("h-11 flex-1 rounded-xl border-2 text-sm font-bold capitalize", theme === t ? "border-nebula bg-nebula/15" : "border-line")}>
+            <button key={t} onClick={() => set({ theme: t })} aria-pressed={theme === t} className={cn("h-11 flex-1 rounded-md border-2 text-sm font-bold capitalize", theme === t ? "border-nebula bg-nebula/15" : "border-line")}>
               {t === "light" ? "Daylight" : t}
             </button>
           ))}
@@ -160,7 +160,7 @@ function AppearanceTab() {
         <legend className="fs-micro mb-2 text-moondust">Space layout</legend>
         <div className="flex gap-2">
           {(["grid", "float"] as const).map((v) => (
-            <button key={v} onClick={() => set({ view: v })} aria-pressed={view === v} className={cn("h-11 flex-1 rounded-xl border-2 text-sm font-bold capitalize", view === v ? "border-nebula bg-nebula/15" : "border-line")}>
+            <button key={v} onClick={() => set({ view: v })} aria-pressed={view === v} className={cn("h-11 flex-1 rounded-md border-2 text-sm font-bold capitalize", view === v ? "border-nebula bg-nebula/15" : "border-line")}>
               {v}
             </button>
           ))}

@@ -94,7 +94,7 @@ export function LinkApprove({ initialCode }: { initialCode: string }) {
                 </p>
               </div>
             </div>
-            <p className="flex gap-2 rounded-xl border border-flare/50 bg-flare/10 p-3 text-sm text-flare">
+            <p className="flex gap-2 rounded-md border border-flare/50 bg-flare/10 p-3 text-sm text-flare">
               <ShieldAlert className="mt-0.5 shrink-0" size={18} />
               Only approve if you are looking at this code on your own screen right now.
             </p>

@@ -92,7 +92,7 @@ export function SpaceSettings({ open, onClose, space, onChanged, onDeleted }: Pr
             <legend className="fs-micro mb-2 text-moondust">New Drops live for</legend>
             <div className="flex gap-2">
               {LIFETIMES.map((l) => (
-                <button key={l} type="button" onClick={() => setLifetime(l)} aria-pressed={lifetime === l} className={cn("font-mono-cargo h-10 flex-1 rounded-xl border-2 text-sm font-semibold", lifetime === l ? "border-nebula bg-nebula/15" : "border-line")}>
+                <button key={l} type="button" onClick={() => setLifetime(l)} aria-pressed={lifetime === l} className={cn("font-mono-cargo h-10 flex-1 rounded-md border-2 text-sm font-semibold", lifetime === l ? "border-nebula bg-nebula/15" : "border-line")}>
                   {l}
                 </button>
               ))}
@@ -110,7 +110,7 @@ export function SpaceSettings({ open, onClose, space, onChanged, onDeleted }: Pr
           <Button variant="secondary" onClick={changePin} disabled={pinBusy || curPin.length < 6 || newPin.length < 6 || !!problem}>Change PIN</Button>
         </section>
 
-        <section className="space-y-3 rounded-2xl border-2 border-redshift/60 p-4" aria-labelledby="ss-del">
+        <section className="space-y-3 rounded-lg border-2 border-redshift/60 p-4" aria-labelledby="ss-del">
           <h3 id="ss-del" className="fs-micro text-redshift">Delete this Space</h3>
           <p className="text-sm text-moondust">Everything in it burns up now. Type <strong className="text-starlight">{space.name}</strong> to confirm.</p>
           <Input value={confirm} onChange={(e) => setConfirm(e.target.value)} aria-label="Type the Space name to confirm" />

@@ -94,7 +94,7 @@ export function PairNewDevice() {
             </p>
           </div>
           <div className="flex items-center gap-4">
-            <div className="shrink-0 rounded-xl bg-paper p-2">
+            <div className="shrink-0 rounded-md bg-paper p-2">
               <QRCodeSVG value={linkUrl} size={104} bgColor="#fffcf5" fgColor="#14101f" />
             </div>
             <ol className="list-decimal space-y-1 pl-5 text-sm text-moondust">

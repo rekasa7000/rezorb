@@ -80,7 +80,7 @@ export function SignInForm({ next, urlError }: { next: string; urlError?: string
           {(p) => <Input {...p} type="password" autoComplete="current-password webauthn" value={password} onChange={(e) => setPassword(e.target.value)} />}
         </Field>
         {error && (
-          <p role="alert" className="rounded-xl border border-redshift/50 bg-redshift/10 px-3 py-2 text-sm text-redshift">
+          <p role="alert" className="rounded-md border border-redshift/50 bg-redshift/10 px-3 py-2 text-sm text-redshift">
             {error}{" "}
             {needsVerify && (
               <button type="button" className="font-bold underline" onClick={resend}>

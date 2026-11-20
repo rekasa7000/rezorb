@@ -30,7 +30,7 @@
   --grad-ion: conic-gradient(from 180deg, #2df5ff, #8b5cff, #3dffa8, #2df5ff);
   --grad-burn: linear-gradient(180deg, #ffb627, #ff4d4d);
 
-  --nebula-opacity: 0.55;
+  --nebula-opacity: 0.36;
   --space-accent: var(--nebula);
 
   --ease-orbit: cubic-bezier(0.22, 1, 0.36, 1);
@@ -39,10 +39,10 @@
   --dur-base: 240ms;
   --dur-slow: 520ms;
 
-  --radius-panel: 24px;
-  --radius-card: 20px;
-  --radius-cargo: 18px;
-  --radius-input: 14px;
+  /* One radius scale: tags 3px, controls 6px, surfaces 10px. Avatars and dots are full circles. */
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
 
   color-scheme: dark;
 }
@@ -112,8 +112,7 @@
   --dur-slow: 0ms;
 }
 :root[data-calm="true"] .cosmos,
-:root[data-calm="true"] .ornament,
-:root[data-calm="true"] .marquee {
+:root[data-calm="true"] .ornament {
   display: none !important;
 }
 :root[data-calm="true"] *,
@@ -188,42 +187,32 @@ body {
 .fs-display { font-size: clamp(2.25rem, 6vw, 4.5rem); line-height: 0.95; font-weight: 800; }
 .fs-micro { font-size: 0.75rem; line-height: 1.3; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em; }
 .text-grad { background: var(--grad-flare); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.text-echo { position: relative; }
-.text-echo::before {
-  content: attr(data-echo);
-  position: absolute; inset: 0; transform: translate(8px, 8px);
-  -webkit-text-stroke: 1px var(--plasma); color: transparent; opacity: 0.4; pointer-events: none;
-  z-index: -1;
-}
 
 /* Surfaces (DESIGN §5.1) */
 .panel {
-  background: color-mix(in srgb, var(--abyss) 80%, transparent);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid var(--line-soft);
-  border-radius: var(--radius-panel);
+  background: var(--abyss);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
 }
 .hull {
   background: var(--hull);
   border: 1px solid var(--line);
-  border-radius: var(--radius-card);
+  border-radius: var(--radius-lg);
 }
 .cargo {
   border: 2px solid var(--space-accent);
-  border-radius: var(--radius-cargo);
-  box-shadow: 6px 6px 0 var(--space-accent);
+  border-radius: var(--radius-lg);
+  box-shadow: 5px 5px 0 var(--space-accent);
   transition: transform var(--dur-fast) var(--ease-orbit), box-shadow var(--dur-fast) var(--ease-orbit);
 }
-.cargo:hover, .cargo:focus-within { transform: translate(-2px, -2px); box-shadow: 8px 8px 0 var(--space-accent); }
+.cargo:hover, .cargo:focus-within { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--space-accent); }
 .cargo-paper { background: var(--paper); color: var(--ink); }
 .cargo-hull { background: var(--hull); color: var(--starlight); }
 
-.sticker {
-  display: inline-flex; align-items: center; gap: 0.35rem;
-  padding: 0.2rem 0.65rem; border-radius: 999px;
-  border: 2px solid var(--void); box-shadow: 3px 3px 0 var(--void);
-  font-size: 0.7rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em;
+.tag {
+  display: inline-flex; align-items: center; gap: 0.3rem;
+  padding: 0.15rem 0.45rem; border-radius: var(--radius-sm);
+  font-size: 0.6875rem; font-weight: 700; line-height: 1.25; text-transform: uppercase; letter-spacing: 0.08em;
   color: var(--void);
 }
 
@@ -238,22 +227,14 @@ body {
   50% { transform: translate3d(-2%, 1.5%, 0) scale(1.12) rotate(2deg); }
   100% { transform: translate3d(0, 0, 0) scale(1.05) rotate(0deg); }
 }
-@keyframes marquee { to { transform: translateX(-50%); } }
 @keyframes bob { 0%, 100% { transform: translateY(-4px); } 50% { transform: translateY(4px); } }
 @keyframes ring-pulse {
   0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ion) 70%, transparent); }
   100% { box-shadow: 0 0 0 18px transparent; }
 }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-@keyframes spin-slow { to { transform: rotate(360deg); } }
-@keyframes slap { 0% { transform: rotate(8deg) scale(1.6); opacity: 0; } 40% { opacity: 1; } 100% { transform: rotate(8deg) scale(1); opacity: 1; } }
-@keyframes ember {
-  to { transform: translate(var(--ex), var(--ey)) scale(0); opacity: 0; }
-}
 .anim-ring-pulse { animation: ring-pulse 900ms var(--ease-orbit) 1; }
 .anim-shake { animation: shake 360ms linear 1; }
-.anim-spin-slow { animation: spin-slow 8s linear infinite; }
-.anim-slap { animation: slap 260ms var(--ease-orbit) 1 both; }
 
 .checker {
   background-color: var(--hull);

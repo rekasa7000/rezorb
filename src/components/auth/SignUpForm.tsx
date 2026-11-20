@@ -40,7 +40,7 @@ export function SignUpForm() {
         subtitle={`We sent a confirmation link to ${email}.`}
         footer={<Link href="/sign-in" className="font-bold text-starlight underline decoration-nebula decoration-2 underline-offset-4">Back to sign in</Link>}
       >
-        <div className="flex items-center gap-3 rounded-2xl border-2 border-aurora bg-aurora/10 p-4 text-sm">
+        <div className="flex items-center gap-3 rounded-lg border-2 border-aurora bg-aurora/10 p-4 text-sm">
           <MailCheck className="shrink-0 text-aurora" />
           <p>Tap the link and you&apos;ll land in your Launchpad.</p>
         </div>
@@ -68,7 +68,7 @@ export function SignUpForm() {
           {(p) => <Input {...p} type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} required />}
         </Field>
         {error && (
-          <p role="alert" className="rounded-xl border border-redshift/50 bg-redshift/10 px-3 py-2 text-sm text-redshift">
+          <p role="alert" className="rounded-md border border-redshift/50 bg-redshift/10 px-3 py-2 text-sm text-redshift">
             {error}
           </p>
         )}

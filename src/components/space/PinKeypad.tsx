@@ -74,7 +74,7 @@ export function PinKeypad({
               <span
                 key={i}
                 className={cn(
-                  "font-mono-cargo grid h-14 w-11 place-items-center rounded-xl border-2 bg-hull text-2xl font-semibold transition-[border-color,box-shadow]",
+                  "font-mono-cargo grid h-14 w-11 place-items-center rounded-md border-2 bg-hull text-2xl font-semibold transition-[border-color,box-shadow]",
                   invalid ? "border-redshift" : active ? "border-nebula shadow-[0_0_0_4px_color-mix(in_srgb,var(--nebula)_20%,transparent)]" : "border-line",
                   ch && !invalid && "border-plasma",
                 )}
@@ -88,15 +88,15 @@ export function PinKeypad({
       {/* On-screen keypad for touch devices */}
       <div className="hidden grid-cols-3 gap-2 [@media(pointer:coarse)]:grid" aria-hidden={disabled}>
         {["1", "2", "3", "4", "5", "6", "7", "8", "9"].map((d) => (
-          <button key={d} type="button" disabled={disabled} onClick={() => press(d)} className="font-mono-cargo h-14 rounded-xl border-2 border-line bg-hull text-xl font-semibold active:bg-hull-2">
+          <button key={d} type="button" disabled={disabled} onClick={() => press(d)} className="font-mono-cargo h-14 rounded-md border-2 border-line bg-hull text-xl font-semibold active:bg-hull-2">
             {d}
           </button>
         ))}
         <span />
-        <button type="button" disabled={disabled} onClick={() => press("0")} className="font-mono-cargo h-14 rounded-xl border-2 border-line bg-hull text-xl font-semibold active:bg-hull-2">
+        <button type="button" disabled={disabled} onClick={() => press("0")} className="font-mono-cargo h-14 rounded-md border-2 border-line bg-hull text-xl font-semibold active:bg-hull-2">
           0
         </button>
-        <button type="button" disabled={disabled} onClick={() => onChange(value.slice(0, -1))} aria-label="Delete last digit" className="grid h-14 place-items-center rounded-xl border-2 border-line bg-hull active:bg-hull-2">
+        <button type="button" disabled={disabled} onClick={() => onChange(value.slice(0, -1))} aria-label="Delete last digit" className="grid h-14 place-items-center rounded-md border-2 border-line bg-hull active:bg-hull-2">
           <Delete size={20} />
         </button>
       </div>

@@ -59,7 +59,7 @@ export function Dialog({
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 grid place-items-center p-4">
-      <div className="absolute inset-0 bg-void/80 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="absolute inset-0 bg-void/85" onClick={onClose} aria-hidden="true" />
       <div
         ref={ref}
         role="dialog"

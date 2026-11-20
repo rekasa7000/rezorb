@@ -70,7 +70,7 @@ export const DropCard = forwardRef<HTMLElement, { drop: DropDTO; actions: DropAc
       >
         <header className={cn("space-y-1.5 text-xs", paper ? "text-ink/70" : "text-moondust")}>
           <div className="flex items-center gap-2">
-            <span className="sticker" style={{ background: k.color, color: "var(--void)" }}>
+            <span className="tag" style={{ background: k.color }}>
               <k.icon size={12} strokeWidth={2.25} aria-hidden /> {k.label}
             </span>
             {drop.kind === "code" && drop.language && drop.language !== "text" && (
@@ -78,7 +78,7 @@ export const DropCard = forwardRef<HTMLElement, { drop: DropDTO; actions: DropAc
             )}
             <span className="ml-auto flex items-center gap-2">
               {drop.pinned && (
-                <span className="sticker !border-flare" style={{ background: "var(--flare)", boxShadow: "none" }} title="Pinned: kept for up to 7 days">
+                <span className="tag" style={{ background: "var(--flare)" }} title="Pinned: kept for up to 7 days">
                   <Pin size={11} aria-hidden /> Pinned
                 </span>
               )}
@@ -128,7 +128,7 @@ export const DropCard = forwardRef<HTMLElement, { drop: DropDTO; actions: DropAc
                 <MoreHorizontal size={18} aria-hidden />
               </Button>
               {menu && (
-                <div role="menu" className="absolute bottom-full right-0 z-20 mb-2 w-52 overflow-hidden rounded-xl border-2 border-void bg-abyss py-1 text-sm text-starlight shadow-[4px_4px_0_var(--void)]" onMouseLeave={() => setMenu(false)}>
+                <div role="menu" className="absolute bottom-full right-0 z-20 mb-2 w-52 overflow-hidden rounded-md border-2 border-void bg-abyss py-1 text-sm text-starlight shadow-[4px_4px_0_var(--void)]" onMouseLeave={() => setMenu(false)}>
                   <MenuItem onClick={() => (setMenu(false), actions.pin(drop))} icon={drop.pinned ? PinOff : Pin}>{drop.pinned ? "Unpin" : "Pin (keep up to 7d)"}</MenuItem>
                   {(["1h", "24h", "7d"] as const).map((l) => (
                     <MenuItem key={l} onClick={() => (setMenu(false), actions.extend(drop, l))} icon={Clock}>Keep for {l} from now</MenuItem>

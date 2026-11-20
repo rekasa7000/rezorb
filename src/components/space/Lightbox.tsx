@@ -9,7 +9,7 @@ export function Lightbox({ drop, onClose, onDownload }: { drop: DropDTO | null; 
     <Dialog open={!!drop} onClose={onClose} title={drop?.fileName ?? "Image"} className="max-w-4xl">
       {drop && (
         <div className="space-y-4">
-          <div className="checker grid place-items-center overflow-hidden rounded-xl">
+          <div className="checker grid place-items-center overflow-hidden rounded-md">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`/api/drops/${drop.id}/download?inline=1`} alt={drop.fileName ?? "Image"} className="max-h-[70dvh] w-auto object-contain" />
           </div>

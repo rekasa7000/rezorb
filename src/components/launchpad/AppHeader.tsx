@@ -24,7 +24,7 @@ export function AppHeader({ email }: { email: string }) {
       <Button variant="ghost" size="icon" aria-label={calm ? "Turn Calm mode off" : "Turn Calm mode on"} aria-pressed={calm} onClick={() => set({ calm: !calm })}>
         {calm ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
       </Button>
-      <Link href="/settings" aria-label="Settings" className="grid size-11 place-items-center rounded-xl text-moondust hover:bg-hull/60 hover:text-starlight">
+      <Link href="/settings" aria-label="Settings" className="grid size-11 place-items-center rounded-md text-moondust hover:bg-hull/60 hover:text-starlight">
         <Settings size={20} strokeWidth={1.75} />
       </Link>
       <Button variant="ghost" size="icon" aria-label="Sign out" onClick={signOut}>
