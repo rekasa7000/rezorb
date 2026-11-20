@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { Halftone, Marquee, OrbitLines, Sticker } from "@/components/cosmos/Ornament";
+import { HeroBackdrop } from "@/components/cosmos/HeroBackdrop";
 import { Wordmark, Orb } from "@/components/cosmos/Orb";
 import { buttonVariants } from "@/components/ui/Button";
 import { getPageWho } from "@/server/page-session";
@@ -32,7 +33,8 @@ const COMPARE: Array<[string, boolean, boolean]> = [
 export default async function Landing() {
   const who = await getPageWho();
   return (
-    <div className="overflow-x-clip">
+    <div className="relative overflow-x-clip">
+      <HeroBackdrop />
       <header className="mx-auto flex max-w-[1280px] items-center gap-4 px-4 py-5 sm:px-8">
         <Link href="/" aria-label="Rezorb home" className="text-starlight"><Wordmark editorial className="text-2xl" /></Link>
         <nav className="ml-auto flex items-center gap-2" aria-label="Account">
@@ -49,7 +51,6 @@ export default async function Landing() {
 
       <main id="main">
         <section className="relative mx-auto max-w-[1280px] px-4 pb-24 pt-10 sm:px-8 sm:pt-20">
-          <Halftone size={520} color="var(--nebula)" className="absolute -right-40 -top-10 hidden opacity-70 md:block" />
           <Halftone size={300} color="var(--ion)" className="absolute -left-24 top-[28rem] hidden opacity-50 md:block" />
           <OrbitLines className="absolute left-1/2 top-24 w-[120%] -translate-x-1/2" />
           <div className="relative">
