@@ -587,3 +587,55 @@ Target **WCAG 2.2 AA**.
 | Command palette | `cmdk`, with: copy latest, lock, Calm, view, settings, Launchpad, shortcuts |
 | "Burn-up" particles / "slap" sticker | The card scales and fades with a grayscale shift on exit; the "COPIED" state is the button turning aurora. No ember particles yet |
 | Unlock animation (keypad splits open) | Not built; the shake on a wrong PIN and the lockout countdown are |
+
+---
+
+## 16. Vogue in orbit: logo, art direction and the 3D hero
+
+**Direction:** a fashion magazine shot in deep space. Planets are the models, lit with hard flash;
+chrome and liquid metal; film grain; cut-out collage. It layers on top of §3–§5 and never overrides
+them: content surfaces stay calm, and Calm mode removes all of it. Image prompts and the full asset
+list are in [docs/ASSETS.md](docs/ASSETS.md).
+
+### 16.1 Logo
+
+| File (`public/brand/`) | Use |
+|------------------------|-----|
+| `rezorb-wordmark.svg` / `-ink` / `-mono` | Primary all-caps lockup, **REZ ● RB**: the orb is the O. Light art on Dark, ink art on Daylight, `currentColor` for single-colour use (inline only; `<img>` can't inherit colour) |
+| `rezorb-editorial.svg` / `-ink` | The vogue lockup: a pink **italic serif "re"** (Instrument Serif) against heavy **ZORB** (Unbounded Black). Used in the landing header |
+| `rezorb-mark.svg` / `-mono` | The orb and ring alone: favicon, app icon, loaders |
+| `rezorb-stacked.svg` | Mark above the wordmark: posters, splash screens |
+
+Text is **outlined** (no font dependency). Regenerate with `scripts/brand/build-logo.mjs`.
+Clear space: the height of the orb on all sides. Don't recolour the ring (only `--plasma`), don't
+outline the wordmark, don't put it on busy nebula without a `--void` plate.
+In the app, `Wordmark` (`components/cosmos/Orb.tsx`) renders the right art for the theme and is sized
+in `em` so `text-*` classes scale it.
+
+### 16.2 The 3D hero (`HeroScene.tsx`, three.js via react-three-fiber)
+
+All procedural, with no image or model downloads:
+
+- **Planet:** a fragment-shader gas giant (fbm bands in pink / violet with cyan clouds), a Fresnel rim,
+  and a hard specular "flash" highlight, lit from upper left.
+- **Rings:** a banded shader ring on the planet's equator plus two thin **chrome tori** reflecting a
+  studio environment baked in code (pink, cyan, white and violet softboxes via `PMREMGenerator`).
+- **Glass Drop cards** orbit the planet, billboarded to the camera (a rounded-rect SDF shader with a
+  tinted edge and three "text" lines).
+- **Stars:** ~1,100 additive points that twinkle; a seeded generator keeps the sky identical each load.
+- **Motion:** pointer parallax, scroll drift, and the planet sits right of the headline and below the
+  amber "into" so the type stays legible.
+
+**Gating** (`HeroBackdrop.tsx`): the scene mounts only if **not Calm**, **no `prefers-reduced-motion`**,
+viewport ≥ 768 px, WebGL works, ≥ 4 cores, and (where reported) ≥ 4 GB device memory, and only after the
+browser is idle. It pauses when off-screen or the tab is hidden, caps DPR at 1.5, and **falls back to
+the flat halftone planet if frames average worse than 30 fps for ~2 s**. Otherwise (and always on
+phones) the flat halftone planet is shown. Cost: one lazy chunk of about **239 KB gzipped**
+(three.js + react-three-fiber), loaded on demand and not part of the page's initial JS.
+
+### 16.3 Calm mode, tightened
+
+Building the hero exposed that Calm hid the 2D starfield with CSS but left its animation loop running.
+It now **unmounts** the starfield (and never mounts the 3D scene), so Calm means no animation work
+at all, not just no visible animation. Tested in `e2e/hero.spec.ts`.
+

@@ -71,7 +71,8 @@ Legend: ✅ done and tested · 🟡 built, **not yet verified against the real s
 - ✅ Landing, Launchpad, Space, auth screens, settings, 404, error boundary, OG image, favicon.
 - ✅ Daylight theme, Calm mode, mobile layout (verified at 390 px: no horizontal overflow), axe clean in Dark and Daylight.
 - ✅ Float view (opt-in, desktop), command palette, shortcut cheat-sheet.
-- ⬜ Illustrations beyond the CSS/SVG ornaments; the full asset checklist in DESIGN §14.
+- ✅ Logo set (outlined SVG), editorial lockup, apple-touch icon, three.js landing hero ([DESIGN §16](../DESIGN.md#16-vogue-in-orbit-logo-art-direction-and-the-3d-hero)).
+- ⬜ Generated imagery (key art, textures, UI illustrations): prompts are ready in [ASSETS.md](ASSETS.md); the images themselves need generating and wiring in.
 - ⬜ Real-device passes (iOS Safari clipboard-image copy, Android file picker/camera).
 
 ## M8 · Launch hardening ⬜

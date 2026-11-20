@@ -13,7 +13,7 @@ no emailing yourself.
 - 📲 **Pair a device with a code or QR**, so you never type a password on a machine you don't trust.
 - 🌌 A loud, maximalist space aesthetic with a **Calm mode** for the office, plus a Daylight theme.
 
-> **Status:** v1 is built and tested locally (33 unit, 49 integration, 9 end-to-end tests, axe-clean
+> **Status:** v1 is built and tested locally (33 unit, 49 integration, 14 end-to-end tests, axe-clean
 > in both themes). It has **not been deployed**, and Neon, R2, Ably, Resend and Upstash have not
 > been exercised for real. Read [docs/TESTING.md](docs/TESTING.md#not-verified) and
 > [docs/ROADMAP.md](docs/ROADMAP.md) before launching. **Don't launch without a CSP.**
@@ -43,7 +43,7 @@ open a private window, sign in, and unlock the same Space.
 
 ## Stack
 
-Next.js 16 (App Router) · React 19 · TypeScript 5.9 · Tailwind v4 · Motion · TanStack Query ·
+Next.js 16 (App Router) · React 19 · TypeScript 5.9 · Tailwind v4 · three.js (react-three-fiber) · Motion · TanStack Query ·
 Zustand · Zod · Drizzle + Postgres (Neon) · Better Auth · Ably · Cloudflare R2 · Upstash Redis ·
 Resend · Vercel.
 
@@ -62,6 +62,7 @@ Resend · Vercel.
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Milestone status (done / unverified / open) and the v2 backlog |
 | [docs/TESTING.md](docs/TESTING.md) | What the tests prove, and what they don't |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, Neon, R2, Ably, env vars, first-deploy checklist |
+| [docs/ASSETS.md](docs/ASSETS.md) | "Vogue in orbit" art direction, the logo set, and every image prompt to generate |
 
 ## History
 

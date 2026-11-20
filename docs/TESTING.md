@@ -28,7 +28,7 @@ traces off (`pnpm e2e` already passes `--trace off`).
 | Typecheck, lint | clean | | TS 5.9, ESLint 10 |
 | Unit | 33 tests / 5 files | < 1 s | PIN rules, lockout math, lifetimes, classifier, formatting, optimistic-cache logic |
 | Integration | 49 tests / 3 files | ~14 s | Route handlers called directly against real Postgres; a simulated `Device` = its own cookie jar and User-Agent |
-| E2E | 9 tests | ~50 s | Real Chromium, production build, two browser contexts = two devices; includes axe (WCAG 2.2 AA) in Dark **and** Daylight |
+| E2E | 14 tests | ~75 s | Real Chromium, production build, two browser contexts = two devices; includes axe (WCAG 2.2 AA) in Dark **and** Daylight |
 
 ## What the tests prove
 
@@ -72,7 +72,9 @@ traces off (`pnpm e2e` already passes `--trace off`).
 9. axe: landing, sign-in, sign-up, Launchpad, Space, Settings in Dark; landing, sign-in,
    Launchpad, Settings, Space in Daylight — zero violations.
 
-Bugs these tests found and that were fixed along the way: a rate limit tripping back-to-back
+10. **Hero (`e2e/hero.spec.ts`):** the three.js scene mounts full-bleed with a real canvas and **no shader/console errors**; it is **not mounted at all** in Calm mode (and no canvas of any kind remains), under `prefers-reduced-motion`, or on a phone viewport (no horizontal overflow); the logo SVGs are served and the wordmark swaps to ink art on Daylight. The e2e browser uses software WebGL (SwiftShader), so this proves the scene compiles and renders, not that it hits 60 fps on real GPUs.
+
+Bugs these tests found and that were fixed along the way: Calm mode left the starfield animation loop running (only hidden); a rate limit tripping back-to-back
 sign-ups; PIN change / revoke not noticed by a device in polling mode; the optimistic card
 re-mounting on the server's reply; a `role="feed"` structure error; low-contrast `--dim` and
 ghost numerals; a focusable link inside an `aria-hidden` region.

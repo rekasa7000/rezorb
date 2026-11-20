@@ -44,7 +44,7 @@ connections, and request bodies are capped at 4.5 MB. So:
 | Layer | Choice | Notes |
 |-------|--------|-------|
 | Framework | **Next.js 16.4**, React 19, **TypeScript 5.9** (strict, `noUncheckedIndexedAccess`) | TS 7 was rejected: `typescript-eslint` doesn't support it yet. [ADR-0001](adr/0001-nextjs-fullstack-on-vercel.md) |
-| UI | Tailwind CSS v4, `motion`, `lucide-react`, `sonner`, `cmdk`, `shiki`, `qrcode.react`, hand-written primitives | **No shadcn/Radix** (see §9) |
+| UI | Tailwind CSS v4, `three` + `@react-three/fiber` (landing hero only), `motion`, `lucide-react`, `sonner`, `cmdk`, `shiki`, `qrcode.react`, hand-written primitives | **No shadcn/Radix** (see §9) |
 | Client state | TanStack Query (server cache), Zustand (per-device prefs) | |
 | Validation | Zod 4, schemas in `src/lib/schemas.ts` shared by client and server | |
 | Database | **Postgres via `pg`** + **Drizzle ORM** + `drizzle-kit` migrations | Developed against Postgres 16; Neon in production. [ADR-0002](adr/0002-postgres-neon-drizzle.md) |
@@ -83,7 +83,7 @@ connections, and request bodies are capped at 4.5 MB. So:
 │  │  ├─ layout.tsx, providers.tsx, fonts.ts, globals.css, error.tsx, not-found.tsx
 │  │  └─ icon.svg, opengraph-image.tsx
 │  ├─ components/
-│  │  ├─ cosmos/    Starfield, CosmosLayers, Orb/Wordmark, Ornament (Sticker, Halftone, Marquee…)
+│  │  ├─ cosmos/    Starfield, CosmosLayers, Orb/Wordmark, Ornament, HeroBackdrop + HeroScene (three.js)
 │  │  ├─ ui/        Button, Input/Field, Dialog
 │  │  ├─ space/     SpaceView, DropCard, DropBody, Dock, PinKeypad, UnlockGate, Constellation,
 │  │  │             BurnRing, SpaceSettings, CommandPalette, Shortcuts, Lightbox
@@ -103,7 +103,9 @@ connections, and request bodies are capped at 4.5 MB. So:
 │  └─ styles/tokens.css Design tokens, themes, Calm mode, layered component CSS
 ├─ e2e/                 Playwright (two browser contexts = two devices)
 ├─ tests/               Vitest setup, helpers (a simulated Device with a cookie jar)
+├─ public/brand/        Outlined logo SVGs
 ├─ scripts/migrate.ts   Applies migrations (used by `pnpm build:vercel`)
+├─ scripts/brand/       One-off logo generator (needs fontkit)
 ├─ vercel.json          Build command + cron
 └─ .env.example
 ```
