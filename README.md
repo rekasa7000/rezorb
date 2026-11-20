@@ -1,152 +1,49 @@
-# Zorb
+# Rezorb
 
-A modern full-stack application with authentication built using React, TypeScript, TanStack Router, TanStack Query, and Node.js.
+> **Throw it into space. Catch it on the other side.**
 
-## Features
+Rezorb is a private, floating **Space** between your own devices. Open the same
+Space on your work laptop and your personal laptop (or phone), **paste on one,
+and catch it on the other** within a second. It handles text, AI answers, code,
+screenshots, photos, and files. There's nothing to install and no emailing
+yourself.
 
-- **Authentication System**
-  - User registration and login
-  - JWT-based authentication with HTTP-only cookies
-  - Protected routes with automatic redirects
-  - Password hashing with bcrypt
-  
-- **Frontend**
-  - React 19 with TypeScript
-  - TanStack Router for routing with route guards
-  - TanStack Query for state management and API calls
-  - Tailwind CSS with custom components
-  - Form validation with Zod and React Hook Form
-  - Zustand for client-side state management
+- 🔒 Every Space is locked with a **name + PIN**, on top of your account.
+- ⏱ Drops **burn up** automatically after 1h, 24h, or 7d.
+- 🛰 **Realtime**: see which of your devices are in the Space right now.
+- 🌌 A loud, maximalist space aesthetic, with a **Calm mode** for the office.
 
-- **Backend**
-  - Node.js with Express
-  - MongoDB with Mongoose
-  - JWT authentication
-  - Input validation with TypeBox
-  - Comprehensive logging with Pino
-  - Error handling middleware
+> **Status:** planning complete, build starting. The `frontend/` (Vite) and
+> `backend/` (Express) folders are the legacy *Zorb* prototype. They will be
+> replaced by a single Next.js app in milestone M0.
 
-## Tech Stack
+## Documentation
 
-### Frontend
-- React 19
-- TypeScript
-- TanStack Router
-- TanStack Query
-- Tailwind CSS
-- Zustand
-- React Hook Form
-- Zod validation
-- Lucide React icons
+| Doc | What's in it |
+|-----|--------------|
+| [docs/PRD.md](docs/PRD.md) | Problem, positioning, decisions, user stories, limits, metrics |
+| [DESIGN.md](DESIGN.md) | The maximalist design system: brand, color, type, motion, components, Calm mode |
+| [CONTEXT.md](CONTEXT.md) | Domain vocabulary (Space, Drop, Beam, Grant, …) |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design on Vercel, source layout, key flows |
+| [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Postgres schema and invariants |
+| [docs/API.md](docs/API.md) | REST and realtime contract |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model, headers, privacy |
+| [docs/adr/](docs/adr/README.md) | Architecture decision records |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Milestones M0–M8 and the v2 backlog |
+| [docs/TESTING.md](docs/TESTING.md) | Test strategy and release gates |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, Neon, R2, Ably, and the environment variables |
 
-### Backend
-- Node.js
-- Express.js
-- MongoDB
-- Mongoose
-- JWT
-- bcryptjs
-- TypeBox
-- Pino logger
+## Stack
 
-## Getting Started
+Next.js (App Router) · TypeScript · Tailwind v4 · shadcn/ui · Motion ·
+TanStack Query · Zustand · Zod · Drizzle + Neon Postgres · Better Auth ·
+Ably · Cloudflare R2 · Upstash Redis · Resend · Vercel
 
-### Prerequisites
-- Node.js 18+
-- MongoDB
-- npm or yarn
+## Quick start (after M0)
 
-### Installation
-
-1. Clone the repository:
 ```bash
-git clone https://github.com/rekasa7000/Zorb.git
-cd zorb
+pnpm install
+cp .env.example .env.local
+pnpm db:migrate
+pnpm dev
 ```
-
-2. Install backend dependencies:
-```bash
-cd backend
-npm install
-```
-
-3. Install frontend dependencies:
-```bash
-cd ../frontend
-npm install
-```
-
-4. Set up environment variables:
-
-Backend (`.env`):
-```env
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/zorb
-JWT_SECRET=your-jwt-secret
-NODE_ENV=development
-```
-
-### Running the Application
-
-1. Start the backend server:
-```bash
-cd backend
-npm run dev
-```
-
-2. Start the frontend development server:
-```bash
-cd frontend
-npm run dev
-```
-
-The frontend will be available at `http://localhost:5173` and the backend at `http://localhost:5000`.
-
-## API Endpoints
-
-### Authentication
-- `POST /auth/signup` - Register a new user
-- `POST /auth/signin` - Login user
-- `POST /auth/logout` - Logout user
-- `GET /auth/check` - Check authentication status
-- `PUT /auth/update-profile` - Update user profile
-
-## Authentication Flow
-
-1. **Registration**: Users can sign up with first name, last name (optional), email, and password
-2. **Login**: Users authenticate with email and password
-3. **JWT Tokens**: Stored in HTTP-only cookies for security
-4. **Route Protection**: TanStack Router guards protect authenticated routes
-5. **Auto-logout**: Invalid or expired tokens automatically log users out
-
-## Project Structure
-
-```
-zorb/
-├── backend/
-│   ├── src/
-│   │   ├── controllers/     # Route controllers
-│   │   ├── middlewares/     # Authentication & error middleware
-│   │   ├── models/          # MongoDB models
-│   │   ├── routes/          # API routes
-│   │   ├── schemas/         # Validation schemas
-│   │   ├── types/           # TypeScript types
-│   │   └── utils/           # Utilities
-│   └── package.json
-└── frontend/
-    ├── src/
-    │   ├── components/      # React components
-    │   ├── hooks/           # Custom hooks for API calls
-    │   ├── routes/          # TanStack Router routes
-    │   ├── store/           # Zustand stores
-    │   └── types/           # TypeScript types
-    └── package.json
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request

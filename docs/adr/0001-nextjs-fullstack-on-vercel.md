@@ -1,0 +1,30 @@
+# ADR-0001: Single Next.js full-stack app on Vercel
+
+**Status:** Accepted (founder, 2026-11-20)
+
+## Context
+The current repo is a Vite + React frontend and a separate Express + socket.io
+backend. The founder wants to deploy on Vercel and prefers one full-stack
+codebase. Vercel runs server code as functions. They can't hold long-lived
+WebSocket connections, request bodies are capped at 4.5 MB, and there's no
+always-on process for `socket.io`.
+
+## Decision
+Replace both apps with **one Next.js (App Router) app** at the repo root. Pages
+are React Server Components. The API is Route Handlers on the Node.js runtime.
+Realtime and file bytes move to managed services (ADR-0004, ADR-0005).
+
+## Consequences
+- ✅ One deploy, one set of env vars, preview deployments per PR, shared Zod types.
+- ✅ The current frontend's choices (React 19, Tailwind v4, shadcn/ui, TanStack
+  Query, Zustand, Zod, React Hook Form) carry over directly.
+- ➖ TanStack Router is replaced by the Next.js file router.
+- ➖ The Express code (controllers, middleware, Mongo models) is retired. Its
+  logic (error handler, response helper, auth guard) is re-expressed as
+  route-handler helpers.
+- ⚠️ No server-held sockets, so realtime needs a third-party service.
+
+## Alternatives considered
+- **Keep Express and deploy it elsewhere (Railway/Fly)** while the frontend is on Vercel:
+  two deploys and CORS/cookie complexity, against the founder's preference.
+- **SvelteKit / Remix on Vercel:** viable, but the existing code and libraries are React and Next-friendly.
