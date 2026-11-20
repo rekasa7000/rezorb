@@ -1,41 +1,41 @@
 import Link from "next/link";
-import { Halftone, OrbitLines, Sticker } from "@/components/cosmos/Ornament";
 import { Wordmark } from "@/components/cosmos/Orb";
 
-/** Split layout (DESIGN §8.5): nebula panel on the left, form on --abyss on the right. */
+/**
+ * Auth layout: a brand panel on the left (type and the mark, nothing else) and the form set
+ * straight on the page on the right. The form isn't boxed; the page is the container.
+ */
 export function AuthShell({ title, subtitle, children, footer }: { title: string; subtitle: string; children: React.ReactNode; footer: React.ReactNode }) {
   return (
-    <main className="grid min-h-dvh lg:grid-cols-2">
-      <aside className="relative hidden overflow-hidden border-r-2 border-void lg:block">
-        <div className="absolute inset-0 bg-void/30" />
-        <Halftone size={520} color="var(--nebula)" className="absolute -left-24 top-10" />
-        <Halftone size={300} color="var(--ion)" className="absolute -bottom-16 right-0" />
-        <OrbitLines className="absolute left-0 top-1/3 w-full" />
-        <div className="relative flex h-full flex-col justify-between p-12">
-          <Link href="/" className="text-starlight">
-            <Wordmark className="text-3xl" />
+    <main className="grid min-h-dvh lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <aside className="hidden border-r border-line bg-abyss lg:block">
+        <div className="flex h-full flex-col p-12">
+          <Link href="/" className="text-starlight" aria-label="Rezorb home">
+            <Wordmark className="text-xl" />
           </Link>
+          {/* The mark fills whatever height is left over, so it can never sit behind the headline. */}
+          <div className="relative my-8 min-h-0 flex-1" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/brand/rezorb-mark.svg" alt="" className="ornament absolute inset-0 h-full w-full object-contain object-left" />
+          </div>
           <div>
-            <p className="fs-display font-display text-starlight">
-              Throw it <span className="font-accent text-grad">into space.</span>
+            <p className="font-display text-5xl font-extrabold leading-[1.02] xl:text-6xl">
+              Throw it <span className="font-accent text-grad font-normal">into space.</span>
             </p>
-            <p className="mt-4 max-w-sm text-lg text-moondust">Catch it on the other side.</p>
-            <div className="mt-8 flex gap-3">
-              <Sticker rotate={-6}>No install</Sticker>
-              <Sticker rotate={4} color="var(--aurora)">PIN locked</Sticker>
-            </div>
+            <p className="mt-5 max-w-sm text-lg text-moondust">Catch it on the other side.</p>
           </div>
         </div>
       </aside>
-      <section className="flex items-center justify-center px-4 py-12 sm:px-8">
-        <div className="panel w-full max-w-md p-6 sm:p-8">
-          <Link href="/" className="mb-6 block text-starlight lg:hidden">
-            <Wordmark />
+
+      <section className="flex items-center px-6 py-12 sm:px-12 lg:px-20">
+        <div className="mx-auto w-full max-w-sm">
+          <Link href="/" className="mb-10 block text-starlight lg:hidden" aria-label="Rezorb home">
+            <Wordmark className="text-xl" />
           </Link>
           <h1 className="font-display text-3xl font-extrabold">{title}</h1>
           <p className="mt-2 text-moondust">{subtitle}</p>
-          <div className="mt-6">{children}</div>
-          <div className="mt-6 border-t border-line pt-4 text-sm text-moondust">{footer}</div>
+          <div className="mt-8">{children}</div>
+          <div className="mt-8 border-t border-line pt-5 text-sm text-moondust">{footer}</div>
         </div>
       </section>
     </main>
