@@ -5,7 +5,6 @@ import { Lock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { PinKeypad } from "./PinKeypad";
 import { api, ApiRequestError } from "@/lib/api-client";
-import { Coordinates } from "@/components/cosmos/Ornament";
 
 /** The PIN screen (DESIGN §9.4) with attempts-left, shake and a live lockout countdown. */
 export function UnlockPanel({ name, onUnlocked, nameEditable = false, initialName = "" }: { name?: string; onUnlocked: (slug: string) => void; nameEditable?: boolean; initialName?: string }) {
@@ -78,7 +77,7 @@ export function UnlockPanel({ name, onUnlocked, nameEditable = false, initialNam
             autoCapitalize="off"
             spellCheck={false}
             data-testid="space-name-input"
-            className="h-12 w-full rounded-[14px] border-2 border-line bg-hull px-4 text-starlight placeholder:text-dim focus:border-nebula focus:outline-none"
+            className="h-12 w-full rounded-md border-2 border-line bg-hull px-4 text-starlight placeholder:text-dim focus:border-nebula focus:outline-none"
             placeholder="e.g. Work swap"
           />
         </div>
@@ -101,12 +100,11 @@ export function UnlockPanel({ name, onUnlocked, nameEditable = false, initialNam
   );
 }
 
-export function UnlockGate({ spaceName, spaceId }: { spaceName: string; spaceId: string }) {
+export function UnlockGate({ spaceName }: { spaceName: string }) {
   const router = useRouter();
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center px-4 py-12">
       <div className="panel relative p-6 sm:p-8">
-        <Coordinates seed={spaceId} className="absolute right-4 top-3" />
         <p className="fs-micro text-moondust">Locked Space</p>
         <h1 className="font-display mt-1 break-words text-3xl font-extrabold">{spaceName}</h1>
         <p className="mb-6 mt-2 text-moondust">Enter its PIN to open it on this device.</p>

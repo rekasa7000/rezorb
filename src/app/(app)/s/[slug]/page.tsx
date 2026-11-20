@@ -26,7 +26,7 @@ export default async function SpacePage({ params }: { params: Promise<{ slug: st
   try {
     await verifySpaceGrant(req, who, s.id);
   } catch {
-    return <UnlockGate spaceName={s.name} spaceId={s.id} />;
+    return <UnlockGate spaceName={s.name} />;
   }
 
   const { drops } = await listDrops({ spaceId: s.id, deviceId: who.deviceId, limit: 100 });

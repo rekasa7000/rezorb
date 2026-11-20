@@ -29,7 +29,7 @@ export function Constellation({ devices, connection, meLabel }: { devices: Prese
           const Icon = ICONS[d.kind as keyof typeof ICONS] ?? Laptop;
           return (
             <span key={d.id} className="relative grid size-8 place-items-center rounded-full border-2 border-void" style={{ background: `hsl(${hue(d.id)} 55% 38%)` }}>
-              <span className="anim-spin-slow absolute -inset-[3px] rounded-full opacity-80" style={{ background: "var(--grad-ion)", mask: "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))", WebkitMask: "radial-gradient(farthest-side, transparent calc(100% - 2px), #000 calc(100% - 2px))" }} aria-hidden />
+              <span className="absolute -inset-[3px] rounded-full border-2 border-ion" aria-hidden />
               <Icon size={14} strokeWidth={1.75} className="relative text-white" aria-hidden />
             </span>
           );

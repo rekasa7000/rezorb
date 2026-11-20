@@ -7,7 +7,6 @@ import { useQueryClient } from "@tanstack/react-query";
 import { ArrowLeft, Clock, Lock, Moon, Settings, Sun, LayoutGrid, Orbit } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
-import { Coordinates, OrbitLines } from "@/components/cosmos/Ornament";
 import { Constellation } from "./Constellation";
 import { DropCard, type DropActions } from "./DropCard";
 import { Dock } from "./Dock";
@@ -266,7 +265,7 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
 
   return (
     <div data-accent={accent} className="min-h-dvh pb-48">
-      <header className="sticky top-0 z-20 border-b-2 border-accent bg-void/75 backdrop-blur-md">
+      <header className="sticky top-0 z-20 border-b-2 border-accent bg-void">
         <div className="mx-auto flex max-w-[1280px] items-center gap-2 px-3 py-3 sm:gap-3 sm:px-8">
           <Link href="/spaces" aria-label="Back to your Spaces" className="rounded-lg p-1.5 text-moondust hover:text-starlight">
             <ArrowLeft size={20} strokeWidth={1.75} />
@@ -274,9 +273,7 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
           <div className="min-w-0 flex-1 sm:flex-none">
             <h1 className="font-display flex items-center gap-2 truncate text-lg font-extrabold text-accent sm:text-2xl" data-testid="space-title">
               <span className="truncate">{space.name}</span>
-              <span className="size-2.5 shrink-0 rounded-full bg-ion" style={{ opacity: feed.connection === "live" ? 1 : 0.35 }} aria-hidden />
             </h1>
-            <Coordinates seed={space.id} className="hidden sm:block" />
           </div>
           <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-3">
             <Constellation devices={feed.presence} connection={feed.connection} meLabel={feed.connection === "polling" ? "Syncing" : undefined} />
@@ -302,15 +299,12 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
       <main id="main" className="mx-auto max-w-[1280px] px-4 pt-8 sm:px-8">
         <p ref={live} className="sr-only" aria-live="polite" />
         {visible.length === 0 ? (
-          <div className="relative mx-auto mt-16 max-w-md text-center">
-            <OrbitLines className="absolute -top-20 left-1/2 w-[140%] -translate-x-1/2" />
-            <div className="relative">
-              <div className="anim-spin-slow mx-auto mb-6 size-24 rounded-full border-4 border-dashed border-accent opacity-80" aria-hidden />
-              <h2 className="font-display text-3xl font-extrabold">Nothing in orbit.</h2>
-              <p className="mt-3 text-moondust">
-                Paste anything (<kbd className="font-mono-cargo rounded border border-line px-1.5">Ctrl/⌘ V</kbd>) or drop a file. It&apos;ll appear on your other devices instantly.
-              </p>
-            </div>
+          <div className="mt-12 max-w-lg sm:mt-20">
+            <h2 className="font-display text-3xl font-extrabold">Nothing in orbit.</h2>
+            <p className="mt-3 text-moondust">
+              Paste with <kbd className="font-mono-cargo rounded-sm border border-line px-1.5 py-0.5 text-sm text-starlight">Ctrl/⌘ V</kbd>, drop a file anywhere, or type
+              below. It shows up on your other devices as soon as they are in this Space.
+            </p>
           </div>
         ) : (
           <div
@@ -333,11 +327,8 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
       <Dock onBeamText={beamText} onFiles={(f) => onFiles(f)} uploads={uploads.items} onRetry={uploads.retry} onCancel={uploads.cancel} textareaRef={dockRef} />
 
       {dragging && (
-        <div className="fixed inset-0 z-40 grid place-items-center bg-void/85 backdrop-blur-sm" data-testid="drop-overlay" aria-hidden>
-          <div className="grid place-items-center gap-6 rounded-[3rem] border-4 border-dashed border-nebula p-16">
-            <span className="anim-spin-slow size-24 rounded-full border-4 border-dashed border-ion" />
-            <p className="fs-mega font-display text-center !text-[clamp(2rem,7vw,5rem)]">Let go to beam</p>
-          </div>
+        <div className="fixed inset-0 z-40 grid place-items-center bg-void/90" data-testid="drop-overlay" aria-hidden>
+          <p className="font-display rounded-lg border-2 border-dashed border-nebula px-12 py-10 text-3xl font-extrabold">Drop to beam</p>
         </div>
       )}
 
