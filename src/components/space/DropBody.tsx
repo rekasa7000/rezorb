@@ -32,7 +32,7 @@ function useHighlighted(code: string, language?: string) {
     if (!language || !SHIKI_LANGS.has(language) || code.length > 20_000) return;
     let live = true;
     import("shiki")
-      .then(({ codeToHtml }) => codeToHtml(code, { lang: language, theme: "github-light" }))
+      .then(({ codeToHtml }) => codeToHtml(code, { lang: language, theme: "github-light-high-contrast" }))
       .then((h) => live && setHtml(h))
       .catch(() => {});
     return () => {
@@ -89,7 +89,7 @@ function FileTypeIcon({ mime, name, ...props }: { mime?: string; name?: string; 
 export function FileBody({ drop }: { drop: DropDTO }) {
   return (
     <div className="flex items-center gap-4">
-      <span className="grid size-14 shrink-0 place-items-center rounded-2xl border border-line bg-hull-2">
+      <span className="grid size-14 shrink-0 place-items-center rounded-lg border border-line bg-hull-2">
         <FileTypeIcon mime={drop.mimeType} name={drop.fileName} size={28} strokeWidth={1.5} className="text-ion" aria-hidden />
       </span>
       <div className="min-w-0">
@@ -105,7 +105,7 @@ export function FileBody({ drop }: { drop: DropDTO }) {
 export function ImageBody({ drop, onOpen }: { drop: DropDTO; onOpen: () => void }) {
   const src = drop.thumbUrl ?? `/api/drops/${drop.id}/download?inline=1`;
   return (
-    <button onClick={onOpen} className="checker block w-full overflow-hidden rounded-xl" aria-label={`Open ${drop.fileName ?? "image"}`}>
+    <button onClick={onOpen} className="checker block w-full overflow-hidden rounded-md" aria-label={`Open ${drop.fileName ?? "image"}`}>
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt={drop.fileName ?? "Image drop"} width={drop.width} height={drop.height} loading="lazy" className="mx-auto max-h-72 w-auto object-contain" />
     </button>

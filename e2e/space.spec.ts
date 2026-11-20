@@ -261,6 +261,7 @@ test("accessibility: no axe violations on the main screens", async ({ browser })
   };
   await a.page.goto("/");
   await a.page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(a.page.getByRole("group", { name: "Example Drops" }).locator("article")).toHaveCount(3); // rendered on the client
   await scan("landing");
   await a.page.goto("/sign-in");
   await scan("sign-in");
@@ -272,6 +273,11 @@ test("accessibility: no axe violations on the main screens", async ({ browser })
   await a.page.getByTestId("dock-input").fill("some text");
   await a.page.getByTestId("dock-input").press("Enter");
   await expect(a.page.getByTestId("drop-card")).toHaveCount(1);
+  // A syntax-highlighted code Drop (keyword colours are where contrast tends to fail).
+  await a.page.getByTestId("dock-input").fill("def add(a, b):\n    return a + b\n\nprint(add(1, 2))");
+  await a.page.getByTestId("dock-input").press("Enter");
+  await expect(a.page.getByTestId("drop-card")).toHaveCount(2);
+  await expect(a.page.locator("article pre.shiki").first()).toBeVisible(); // highlighting has applied
   await scan("space");
   await a.page.goto("/settings");
   await scan("settings");
@@ -281,12 +287,14 @@ test("accessibility: no axe violations on the main screens", async ({ browser })
   for (const path of ["/", "/sign-in", "/spaces", "/settings"]) {
     await a.page.goto(path);
     await expect(a.page.locator("html")).toHaveAttribute("data-theme", "light");
+    if (path === "/") await expect(a.page.getByRole("group", { name: "Example Drops" }).locator("article")).toHaveCount(3);
     await scan(`${path} (Daylight)`);
   }
   await a.page.goto("/spaces");
   await a.page.getByTestId("space-card").first().click();
   await a.page.waitForURL("**/s/*");
-  await expect(a.page.getByTestId("drop-card")).toHaveCount(1);
+  await expect(a.page.getByTestId("drop-card")).toHaveCount(2);
+  await expect(a.page.locator("article pre.shiki").first()).toBeVisible();
   await scan("space (Daylight)");
   await a.ctx.close();
 });
