@@ -112,8 +112,7 @@ tint. That keeps contrast high even when the screen is busy.
   `--ink` on `--paper` (≥ 17:1).
 - Neon colors (`--nebula`, `--ion`, `--flare`, `--aurora`) **may be used for text
   only at ≥ 18px bold or for single-word labels**. They all pass AA-large on `--void`.
-- **Never** put text directly on `--grad-nebula`. Use a `--void` at 70% plate with
-  `backdrop-filter: blur(12px)`.
+- **Never** put text directly on `--grad-nebula`. Put it on a solid `--void` or `--abyss` surface.
 - State is never conveyed by color alone. Every state color comes with an
   icon *and* a word.
 - **These rules are enforced, not aspirational:** the Playwright suite runs axe (WCAG 2.2 AA)
@@ -213,31 +212,23 @@ where the maximalism comes from. Calm mode removes layers 1–3.
 
 | Surface | Background | Border | Radius | Shadow |
 |---------|-----------|--------|--------|--------|
-| **Panel** | `--abyss` @ 80% + `blur(16px)` | `1px solid #FFFFFF14` | `24px` | none |
-| **Hull card** | `--hull` | `1px solid #FFFFFF1F` | `20px` | `0 0 0 1px #00000066, 0 20px 40px -20px #000` |
-| **Cargo card** (Drop) | `--paper` (text/code) or `--hull` (file/image) | `2px solid var(--space-accent)` | `18px` | **Hard offset shadow** `6px 6px 0 var(--space-accent)` |
-| **Sticker** | solid neon | `2px solid --void` | `999px` | `3px 3px 0 --void` |
-| **Input** | `--hull` | `2px solid #FFFFFF26` → `--nebula` on focus | `14px` | focus: `0 0 0 4px #FF3DB833` |
+| **Panel** | `--abyss`, solid | `1px solid --line` | `10px` (`lg`) | none |
+| **Hull** | `--hull` | `1px solid --line` | `10px` (`lg`) | none |
+| **Cargo card** (Drop) | `--paper` (text/code/link) or `--hull` (file/image) | `2px solid var(--space-accent)` | `10px` (`lg`) | **Hard offset shadow** `5px 5px 0 var(--space-accent)` |
+| **Tag** | solid kind colour | none | `3px` (`sm`) | none |
+| **Input** | `--hull` | `2px solid --line`, `--nebula` on focus | `6px` (`md`) | focus ring `0 0 0 4px` nebula @ 20% |
+
+Surfaces are **solid**. There is no backdrop blur anywhere (see §17).
 
 The **hard offset shadow** on cargo cards is a key recognisable detail. It is
 neo-brutalist and contrasts with the soft glowing space behind it.
 
 ### 5.2 Ornaments
 
-Decorative only. All are `aria-hidden` and removed in Calm mode.
-
-- **Orbit lines:** thin elliptical SVG strokes (`--plasma` @ 30%) that wrap
-  around headers and empty states.
-- **Coordinates:** tiny mono text in the corners of panels, e.g.
-  `RA 14h 29m · DEC −62° 40′`, generated from the Space ID. Fake telemetry is
-  pure flavor.
-- **Stickers:** rotated (−6° to 6°) pill badges stuck onto cards and the
-  landing page: `NO INSTALL`, `24H TTL`, `PIN LOCKED`, `ZERO SETUP`.
-- **Marquee belt:** a full-width scrolling strip on the landing page
-  (`PASTE HERE ✦ COPY THERE ✦ NO EMAIL-TO-SELF ✦ NO INSTALL ✦`) in Unbounded on
-  `--flare`, tilted −2°.
-- **Halftone planets:** large partially-cropped circles filled with a halftone
-  dot pattern, sitting behind hero content.
+The restraint pass (§17) removed orbit lines, the fabricated coordinates, rotated stickers and the
+marquee. What remains decorative is: the **halftone planet** (hero fallback), the **grain** and
+**nebula** layers behind the app, and the **mark** on the auth panel. All are `aria-hidden`, and
+Calm mode removes them.
 
 ---
 
@@ -327,27 +318,25 @@ the layered effects stop.
 
 ### 8.3 Launchpad (`/spaces`)
 
-The signed-in home, listing the user's Spaces and offering a way into one.
+A utility screen, composed like one.
 
-- **Top:** a mega headline, "**Where to?**", with an outline echo.
-- **Enter a Space** panel: Space name input and a 6-digit PIN keypad, plus an
-  "Enter" button. This is the main action of the page.
-- **Your Spaces:** cards that show each Space as a planet (accent-colored
-  halftone circle), its name, the number of Drops in orbit, and when it was
-  last active. Clicking a card prefills the name, so only the PIN is still
-  needed.
-- **Create a Space** card: a dashed outline with a `+` Orb.
+- **Title:** "Where to?" at page-title scale (not a poster headline).
+- **Enter a Space** (left, the primary task): name input, the PIN keypad and Enter, in a single panel.
+- **Your Spaces** (right): a plain ruled list. Each row has a 4px accent bar, the name, "N in orbit, last
+  active X" (or "Empty"), and a text status ("Open here" or "PIN needed"). Clicking a row prefills the name.
+  A final "New Space" row opens the create dialog. No thumbnails, no cards.
 
 ### 8.4 Landing (`/`)
 
-Order: Hero, then Marquee belt, then "How it works" (3 big numbered steps:
-**Open → Paste → Catch**), then a use-case wall (sticker-covered cards: "AI answer → work
-laptop", "Phone photo → desktop", "Snippet → meeting PC"), then "Why not
-email-to-self?" (comparison table), then Privacy & limits, then the final CTA.
+Each section has its own composition on purpose:
 
-Hero: mega `THROW IT *into space*.` with `CATCH IT ON THE OTHER SIDE.`
-underneath, two halftone planets, a floating mock Space with three Drops
-drifting, and the stickers `NO INSTALL` and `PIN LOCKED`.
+1. **Hero:** the headline, one sentence, two buttons, one line of plain text for the terms, and the 3D planet.
+2. **The product:** three real, working `DropCard`s as examples (copy works; nothing is sent anywhere).
+3. **How it works:** a split. The heading sits on the left, the three numbered steps in a ruled list on the right.
+4. **Who it's for:** four statements set large in the serif italic, two columns.
+5. **Compared:** a split. The heading on the left, a ruled table on the right.
+6. **Straight talk:** a narrow ruled list with a smaller heading, because it is fine print.
+7. **Close:** one heading and one button, then the footer.
 
 ### 8.5 Other screens
 
@@ -553,9 +542,8 @@ Target **WCAG 2.2 AA**.
 - **Performance budget for decoration:** ≤ 4ms main-thread time per frame on a
   mid-range laptop. If the frame rate drops below 40fps for 3 seconds, the app
   automatically falls back to static layers.
-- **Stickers and ornaments** (`Sticker`, `OrbitLines`, `Halftone`, `Coordinates`, `Marquee` in
-  `Ornament.tsx`) all carry the `.ornament`/`.marquee` class, which Calm mode hides in one rule.
-  They are `aria-hidden`.
+- **Decorative layers** (`Halftone`, the nebula, the grain) carry `.ornament` or sit in `.cosmos`, which Calm mode
+  hides in one rule. They are `aria-hidden`. (Stickers, orbit lines, coordinates and the marquee were removed; see §17.)
 - **Components are hand-written** (`Button`, `Input`/`Field`, `Dialog`) on the tokens rather than
   shadcn/ui: the look is too custom to be worth fighting a component library for.
 
@@ -638,4 +626,46 @@ phones) the flat halftone planet is shown. Cost: one lazy chunk of about **239 K
 Building the hero exposed that Calm hid the 2D starfield with CSS but left its animation loop running.
 It now **unmounts** the starfield (and never mounts the 3D scene), so Calm means no animation work
 at all, not just no visible animation. Tested in `e2e/hero.spec.ts`.
+
+---
+
+## 17. The restraint pass
+
+A design audit found the first version leaned on decoration that said nothing. This section records what
+was removed and the rules that replaced it. **When in doubt, remove it.**
+
+### 17.1 What was removed, and why
+
+| Removed | Why |
+|---------|-----|
+| **Fabricated telemetry** ("RA 16h 28m, DEC -39° 53′", derived from an ID) | It looked like data and was not. A meaningless metric is worse than none. |
+| **Glassmorphism** (blurred translucent panels, headers, dialogs) | A default AI look, and it hurt legibility over the nebula. Surfaces are solid now. |
+| **Rotated pill stickers** ("No install", "PIN locked", "Burns after 24h", "use case") | They repeated claims already on the page. The only labels left are functional (a Drop's kind, Pinned, This device) and they are square tags. |
+| **Orbit lines, extra halftones, outline-echo headlines, the marquee** | Decoration with no job. |
+| **Spinning rings** (empty state, presence, drop overlay) and the bouncing create button | Motion that carried no meaning. |
+| **The 8rem "WHERE TO?" poster** on a form screen | Wrong scale for a utility page. |
+| **Identical card grids** on the landing page and in the Launchpad | Replaced by ruled lists and varied compositions (§8.3, §8.4). |
+| **Five competing radii** | One scale (§17.2). |
+
+### 17.2 Tokens added or tightened
+
+- **Radius scale:** `sm 3px` (tags), `md 6px` (controls), `lg 10px` (surfaces); `full` only for avatars and dots.
+  Set in the Tailwind theme (`globals.css`), so `rounded-md` and `rounded-lg` mean the same everywhere.
+- **Nebula opacity** 0.55 to 0.36. Ink black dominates; colour is for the product (cards, primary action).
+- **Display face** (Unbounded) is for page titles, the primary button, and the large statements. UI labels,
+  row titles and table text use the UI face.
+- **Hard offset shadow** reduced from 6px to 5px (7px on hover). It stays the signature of a Drop.
+
+### 17.3 Fixes the audit surfaced
+
+- The auth panel's mark sat **behind** the headline and made it illegible. It now has its own region in a
+  flex column, so it cannot collide at any height.
+- The syntax highlighter's keyword red measured 4.46:1 on the paper card (AA needs 4.5). It now uses the
+  `github-light-high-contrast` theme. The landing examples are scanned in both themes and a highlighted
+  code Drop is scanned in the Space, so this cannot regress unnoticed.
+
+### 17.4 What was kept, deliberately
+
+The hard-shadow paper cards, the PIN keypad, the editorial wordmark, the 3D planet, Calm mode, and the
+Dark and Daylight themes: they are specific to this product and carry real information or identity.
 
