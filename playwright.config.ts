@@ -22,9 +22,11 @@ export default defineConfig({
       use: {
         ...devices["Desktop Chrome"],
         // Optional: point at an existing Chromium (CI images, sandboxes) instead of `playwright install`.
-        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_PATH
-          ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH, args: ["--no-sandbox"] }
-          : {},
+        // Software WebGL (SwiftShader) so the three.js hero renders on machines without a GPU.
+        launchOptions: {
+          args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", ...(process.env.PLAYWRIGHT_CHROMIUM_PATH ? ["--no-sandbox"] : [])],
+          ...(process.env.PLAYWRIGHT_CHROMIUM_PATH ? { executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH } : {}),
+        },
       },
     },
   ],
