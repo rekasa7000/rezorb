@@ -14,9 +14,9 @@ Use **Better Auth** with the Drizzle adapter and these plugins: `magicLink`,
 `session.create` hook binds the session to a `device` row.
 
 ## Consequences
-- ✅ Covers every required method without custom crypto.
-- ✅ Self-hosted in our DB, so there are no per-MAU costs.
-- ➖ Pin the version and read release notes, because the plugin APIs move.
+- Pro: Covers every required method without custom crypto.
+- Pro: Self-hosted in our DB, so there are no per-MAU costs.
+- Con: Pin the version and read release notes, because the plugin APIs move.
 - If the device authorization plugin doesn't fit, the fallback is a small custom
   `pairing` table (code, status, requesting UA, expiry) plus a polling endpoint,
   about 150 lines of code.

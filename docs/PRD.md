@@ -3,8 +3,8 @@
 Status: **v1 built (not deployed)** · Owner: founder · Last updated: 2026-11-20
 
 > **Implementation status:** every v1 user story in §6 is implemented and exercised by tests
-> against local services, except where [ROADMAP.md](ROADMAP.md) marks a piece 🟡 (written, not
-> yet run against the real service: email verification, magic link, passkeys, Ably, R2) or ⬜
+> against local services, except where [ROADMAP.md](ROADMAP.md) marks a piece Unverified (written, not
+> yet run against the real service: email verification, magic link, passkeys, Ably, R2) or Open
 > (account deletion, data export, CSP, CI). Where the build chose differently from this
 > document, [ARCHITECTURE.md §9](ARCHITECTURE.md#9-decisions-that-departed-from-the-original-plan)
 > says so.
@@ -21,7 +21,7 @@ of text, an AI answer, a screenshot, a photo, a PDF. Today they:
 
 Every one of these is slow (5–10 steps), clutters a real inbox or chat, and
 often doesn't work. You can't install an app on a locked-down work machine, and
-the two devices may not share an account or ecosystem (Windows ↔ Mac ↔ Android).
+the two devices may not share an account or ecosystem (Windows, Mac, Android).
 
 ## 2. Solution
 

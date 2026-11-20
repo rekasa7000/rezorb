@@ -7,11 +7,11 @@ work laptop and your personal laptop (or phone), **paste on one, and catch it on
 It handles text, AI answers, code, screenshots, photos and files. There's nothing to install and
 no emailing yourself.
 
-- 🔒 Every Space is locked with a **name + PIN**, on top of your account (Argon2id, lockout, per-device grants).
-- ⏱ Drops **burn up** automatically after 1 hour, 24 hours or 7 days.
-- 🛰 **Realtime** presence: see which of your devices are in the Space.
-- 📲 **Pair a device with a code or QR**, so you never type a password on a machine you don't trust.
-- 🌌 A loud, maximalist space aesthetic with a **Calm mode** for the office, plus a Daylight theme.
+- Every Space is locked with a **name + PIN**, on top of your account (Argon2id, lockout, per-device grants).
+- Drops **burn up** automatically after 1 hour, 24 hours or 7 days.
+- **Realtime** presence: see which of your devices are in the Space.
+- **Pair a device with a code or QR**, so you never type a password on a machine you don't trust.
+- A loud, maximalist space aesthetic with a **Calm mode** for the office, plus a Daylight theme.
 
 > **Status:** v1 is built and tested locally (33 unit, 49 integration, 14 end-to-end tests, axe-clean
 > in both themes). It has **not been deployed**, and Neon, R2, Ably, Resend and Upstash have not

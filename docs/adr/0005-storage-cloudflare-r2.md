@@ -19,9 +19,9 @@ objects older than 8 days as a backstop. CORS allows PUT/GET from the app
 origins only.
 
 ## Consequences
-- ✅ **Zero egress fees**, which matters for a download-heavy product.
-- ✅ Private by default, with S3-compatible tooling.
-- ➖ An extra vendor. Thumbnails are generated client-side, because there's no
+- Pro: **Zero egress fees**, which matters for a download-heavy product.
+- Pro: Private by default, with S3-compatible tooling.
+- Con: An extra vendor. Thumbnails are generated client-side, because there's no
   image transformation service.
 
 ## Alternatives considered

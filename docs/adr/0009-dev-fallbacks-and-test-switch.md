@@ -24,9 +24,9 @@ that, and `isE2E()` **throws if `VERCEL_ENV=production`**. The dev-storage route
 the active store.
 
 ## Consequences
-- ✅ The full app, including multipart uploads, runs and is tested with just Postgres.
-- ✅ A misconfigured production deploy errors instead of quietly writing files to a lambda's disk.
-- ➖ The fallbacks are not the real thing: R2/Ably/Resend/Upstash behaviour is **untested** until run
+- Pro: The full app, including multipart uploads, runs and is tested with just Postgres.
+- Pro: A misconfigured production deploy errors instead of quietly writing files to a lambda's disk.
+- Con: The fallbacks are not the real thing: R2/Ably/Resend/Upstash behaviour is **untested** until run
   against the real services (see [TESTING.md](../TESTING.md#not-verified)).
-- ➖ `REZORB_E2E` is a deliberate hole in the production checks. It is guarded, documented, and
+- Con: `REZORB_E2E` is a deliberate hole in the production checks. It is guarded, documented, and
   should never be set outside the test runner.

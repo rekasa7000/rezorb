@@ -8,7 +8,7 @@ runtime. Request and response bodies are JSON, validated with Zod schemas in
 
 - **Auth:** a Better Auth session cookie. Every endpoint except `/api/auth/**` and
   `/api/cron/**` returns `401` without a session.
-- **Space grant:** every endpoint marked 🔒 also needs a valid `rz_g_{spaceId}`
+- **Space grant:** every endpoint marked **(grant)** also needs a valid `rz_g_{spaceId}`
   cookie (see [ARCHITECTURE § 4.1](ARCHITECTURE.md#41-unlocking-a-space)). If it
   is missing or invalid, the endpoint returns `403 {code: "SPACE_LOCKED"}`.
 - **CSRF:** cookies are `SameSite=Lax`; all mutations must send
@@ -100,30 +100,30 @@ Returns `{ spaces: SpaceDTO[] }` for the current user, ordered by `lastActivityA
 
 Rate limits: 10/min per user, 30/min per IP.
 
-### `PATCH /api/spaces/:id` 🔒
+### `PATCH /api/spaces/:id` (grant)
 `{ name?, accent?, defaultLifetime? }` → `{ space }`
 
-### `POST /api/spaces/:id/pin` 🔒
+### `POST /api/spaces/:id/pin` (grant)
 `{ currentPin, newPin }`. Bumps `pin_version`, revokes all grants except this
 device's (which is re-issued), and publishes `space.relocked`.
 
-### `POST /api/spaces/:id/lock` 🔒
+### `POST /api/spaces/:id/lock` (grant)
 Revokes this device's grant and clears the cookie. Returns `204`.
 
-### `DELETE /api/spaces/:id` 🔒
+### `DELETE /api/spaces/:id` (grant)
 Body `{ confirmName }`, which must equal the Space name. Deletes the Space and its
 drops, schedules R2 prefix deletion, and publishes `space.deleted`. Returns `204`.
 
 ## Drops
 
-### `GET /api/spaces/:id/drops` 🔒
+### `GET /api/spaces/:id/drops` (grant)
 `?cursor&limit=50&since=<ISO>` → `{ drops: DropDTO[], nextCursor, serverTime }`.
 Pass a previous `serverTime` as `since` to get only drops created/updated after it.
 `since` returns drops created or updated after that time. Polling fallback uses it.
 Only unexpired drops with status `ready` are returned, plus any `uploading` drops
 from this device.
 
-### `POST /api/spaces/:id/drops` 🔒
+### `POST /api/spaces/:id/drops` (grant)
 Creates a text, code, or link drop.
 ```json
 { "kind": "text", "text": "…", "lifetime": "24h", "clientId": "tmp_123" }
@@ -134,7 +134,7 @@ Creates a text, code, or link drop.
   http(s) URL, otherwise it is stored as `text`).
 - Returns `201 { drop }` and publishes `drop.created`.
 
-### `POST /api/spaces/:id/uploads` 🔒
+### `POST /api/spaces/:id/uploads` (grant)
 Starts a file or image upload.
 ```json
 { "fileName": "report.pdf", "mimeType": "application/pdf", "sizeBytes": 2483022,
@@ -150,22 +150,22 @@ Starts a file or image upload.
 ```
   For sizes over 25 MB: `"upload": { "method": "multipart", "uploadId": "…", "partSize": 8388608, "parts": [{ "partNumber": 1, "url": "…" }, …] }`.
 
-### `POST /api/drops/:id/complete` 🔒
+### `POST /api/drops/:id/complete` (grant)
 `{ "parts"?: [{ "partNumber": 1, "etag": "…" }] }`. Finalizes the upload: it
 completes the multipart upload if needed, runs a `HEAD` on the object and
 verifies the size (`422 SIZE_MISMATCH` and burn on mismatch), sets status to
 `ready`, updates the quota, and publishes `drop.created`. Returns `{ drop }`.
 
-### `PATCH /api/drops/:id` 🔒
+### `PATCH /api/drops/:id` (grant)
 `{ pinned?: boolean, extend?: Lifetime }`. `extend` sets
 `expiresAt = now + lifetime`, capped at `createdAt + 7d`. Publishes `drop.updated`.
 
-### `DELETE /api/drops/:id` 🔒
+### `DELETE /api/drops/:id` (grant)
 Hard-deletes the row and its R2 objects, and publishes `drop.burned`. Returns `204`.
 The client's 5-second **undo** is implemented by *delaying* this call, not by
 soft delete.
 
-### `GET /api/drops/:id/download` 🔒
+### `GET /api/drops/:id/download` (grant)
 `?variant=blob|thumb&inline=0|1`. Returns `302` to a presigned R2 GET URL (TTL 60s).
 `inline=1` is allowed **only** for `image/png|jpeg|webp|gif` (used for `<img>`
 and copy-as-image). Everything else is forced to `attachment`.

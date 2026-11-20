@@ -15,14 +15,14 @@ are React Server Components. The API is Route Handlers on the Node.js runtime.
 Realtime and file bytes move to managed services (ADR-0004, ADR-0005).
 
 ## Consequences
-- ✅ One deploy, one set of env vars, preview deployments per PR, shared Zod types.
-- ✅ The current frontend's choices (React 19, Tailwind v4, shadcn/ui, TanStack
+- Pro: One deploy, one set of env vars, preview deployments per PR, shared Zod types.
+- Pro: The current frontend's choices (React 19, Tailwind v4, shadcn/ui, TanStack
   Query, Zustand, Zod, React Hook Form) carry over directly.
-- ➖ TanStack Router is replaced by the Next.js file router.
-- ➖ The Express code (controllers, middleware, Mongo models) is retired. Its
+- Con: TanStack Router is replaced by the Next.js file router.
+- Con: The Express code (controllers, middleware, Mongo models) is retired. Its
   logic (error handler, response helper, auth guard) is re-expressed as
   route-handler helpers.
-- ⚠️ No server-held sockets, so realtime needs a third-party service.
+- Risk: No server-held sockets, so realtime needs a third-party service.
 
 ## Alternatives considered
 - **Keep Express and deploy it elsewhere (Railway/Fly)** while the frontend is on Vercel:

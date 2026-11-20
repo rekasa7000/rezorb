@@ -23,19 +23,19 @@ connections, and request bodies are capped at 4.5 MB. So:
                          ┌──────────────────────────── Vercel ───────────────────────────┐
   Device A (browser)     │  Next.js 16 (App Router)                                      │
   ─────────────────      │   • RSC pages  /  /spaces  /s/[slug]  /settings  /pair  /link │
-   paste / drop ─────────┼─▶ • Route Handlers  /api/**          (Node runtime)          │
+   paste / drop ─────────┼─> • Route Handlers  /api/**          (Node runtime)          │
                          │   • Better Auth     /api/auth/**  (+ custom pairing plugin)   │
                          │   • Vercel Cron     /api/cron/burn                            │
                          └──────┬───────────┬──────────────┬──────────────┬─────────────┘
                                 │           │              │              │
                      SQL (Drizzle)   rate limit      publish events   presign PUT/GET
                                 │           │              │              │
-                        ┌───────▼──┐  ┌─────▼────┐  ┌──────▼─────┐  ┌─────▼──────┐
+                        ┌───────v──┐  ┌─────v────┐  ┌──────v─────┐  ┌─────v──────┐
                         │  Neon    │  │ Upstash  │  │   Ably     │  │ Cloudflare │
                         │ Postgres │  │  Redis   │  │  Realtime  │  │     R2     │
-                        └──────────┘  └──────────┘  └──────┬─────┘  └─────▲──────┘
+                        └──────────┘  └──────────┘  └──────┬─────┘  └─────^──────┘
                                                            │ subscribe    │ PUT bytes
-  Device B (browser) ◀─────────── drop.created ────────────┘              │ (direct)
+  Device B (browser) <─────────── drop.created ────────────┘              │ (direct)
                                                      Device A ────────────┘
 ```
 
@@ -119,7 +119,7 @@ remain reachable in git history at commit `3c84314`.
 
 ```
 Browser                              POST /api/spaces/unlock            Postgres
-  │ {name, pin} ───────────────────────▶│ requireUser (session → device row, not revoked)
+  │ {name, pin} ───────────────────────>│ requireUser (session → device row, not revoked)
   │                                     │ enforceRate: 10/min per user, 30/min per IP
   │                                     │ find space by (owner_id, lower(trim(name)))
   │                                     │   not found → dummy Argon2 verify → 401 (same shape)
@@ -127,7 +127,7 @@ Browser                              POST /api/spaces/unlock            Postgres
   │                                     │ argon2.verify
   │                                     │   ✗ → recordFailedAttempt (row lock) → 401 {attemptsLeft} | 423
   │                                     │   ✓ → reset counter; revoke old grant for this device; insert grant
-  │◀── 200 {space} + Set-Cookie rz_g_{spaceId}=<grantId>.<hmac>; HttpOnly; SameSite=Lax
+  │<── 200 {space} + Set-Cookie rz_g_{spaceId}=<grantId>.<hmac>; HttpOnly; SameSite=Lax
 ```
 
 - A wrong PIN is counted inside a transaction that holds `SELECT … FOR UPDATE` on the
@@ -156,12 +156,12 @@ Browser                              POST /api/spaces/unlock            Postgres
 
 ```
 Client                         API                                      Storage
-  │ POST /uploads {name,size,mime,kind,w,h,withThumb} ─▶ validate size/quota (advisory lock)
+  │ POST /uploads {name,size,mime,kind,w,h,withThumb} ─> validate size/quota (advisory lock)
   │                                        insert drop(status='uploading'); reserve size
-  │◀── {drop, upload:{single|multipart}, thumbUpload}
-  │ PUT bytes (XHR for progress; multipart: 8 MB parts, 3 in parallel) ───────▶│
-  │ PUT thumbnail (client-made 480px WebP) ───────────────────────────────────▶│
-  │ POST /drops/:id/complete {parts?} ─────▶ complete multipart; HEAD → size must match
+  │<── {drop, upload:{single|multipart}, thumbUpload}
+  │ PUT bytes (XHR for progress; multipart: 8 MB parts, 3 in parallel) ───────>│
+  │ PUT thumbnail (client-made 480px WebP) ───────────────────────────────────>│
+  │ POST /drops/:id/complete {parts?} ─────> complete multipart; HEAD → size must match
   │                                        status='ready'; publish drop.created
 ```
 
@@ -233,7 +233,7 @@ rendered as text, no content in logs.
 | Env | Database | Bucket | Notes |
 |-----|----------|--------|-------|
 | Local | Local Postgres (or a Neon dev branch) | `.dev-storage/` on disk | No Ably/Resend/Redis needed |
-| Preview | Neon branch per preview (Vercel ↔ Neon integration) | `rezorb-preview` | |
+| Preview | Neon branch per preview (Vercel-Neon integration) | `rezorb-preview` | |
 | Production | Neon main | `rezorb-prod` | |
 
 Setup steps: [DEPLOYMENT.md](DEPLOYMENT.md).

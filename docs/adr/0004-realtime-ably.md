@@ -14,9 +14,9 @@ limited to `subscribe` + `presence` on `space:{id}` for Spaces with valid grants
 connection drops, the client falls back to polling with `?since=`.
 
 ## Consequences
-- ✅ Fine-grained capability tokens, presence built in, and connection recovery with message history.
-- ✅ The free tier covers early usage. Usage is mostly connection-minutes and messages.
-- ➖ Another vendor and another set of keys.
+- Pro: Fine-grained capability tokens, presence built in, and connection recovery with message history.
+- Pro: The free tier covers early usage. Usage is mostly connection-minutes and messages.
+- Con: Another vendor and another set of keys.
 - Keep the realtime module behind a small interface (`publish(channel, event, data)`,
   `createToken(capabilities)`) so the provider can be swapped.
 

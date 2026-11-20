@@ -22,8 +22,8 @@ Five layers:
    line of defense.
 
 ## Consequences
-- ✅ Expiry is exact for users. Storage is freed within hours on Pro and within a day on Hobby.
-- ➖ On Hobby, quota numbers may include expired-but-unburned bytes for up to a
+- Pro: Expiry is exact for users. Storage is freed within hours on Pro and within a day on Hobby.
+- Con: On Hobby, quota numbers may include expired-but-unburned bytes for up to a
   day. The quota check therefore sums only unexpired drops.
 - Note: Vercel Hobby is for non-commercial use. Move to Pro before charging money.
 

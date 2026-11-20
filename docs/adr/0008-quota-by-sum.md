@@ -16,8 +16,8 @@ In-flight uploads reserve their declared size (plus 256 KB if a thumbnail is com
 up on `complete`; an upload abandoned for over an hour stops counting.
 
 ## Consequences
-- ✅ Cannot drift; expiry is exact for quota even when cleanup is late; one fewer column to maintain.
-- ✅ No migration or recompute job to write.
-- ➖ One aggregate query per upload/beam. At ≤ 500 drops per Space and ≤ 10 Spaces this is small and
+- Pro: Cannot drift; expiry is exact for quota even when cleanup is late; one fewer column to maintain.
+- Pro: No migration or recompute job to write.
+- Con: One aggregate query per upload/beam. At ≤ 500 drops per Space and ≤ 10 Spaces this is small and
   uses the `(space_id, id)` index; revisit if limits grow by orders of magnitude.
-- ➖ The advisory lock serialises a single user's concurrent writes. Fine for a self-transfer product.
+- Con: The advisory lock serialises a single user's concurrent writes. Fine for a self-transfer product.

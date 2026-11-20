@@ -56,11 +56,11 @@ Related: product scope in [`docs/PRD.md`](docs/PRD.md), vocabulary in
 Rezorb talks like a calm mission controller with a sense of humor: short,
 confident, and a little cosmic, **but never cute when something went wrong.**
 
-| Situation | ✅ Do | ❌ Don't |
+| Situation | Do | Don't |
 |-----------|------|---------|
-| Text arrived | "Docked." | "Yay!! Your text is here 🎉🎉" |
+| Text arrived | "Docked." | "Yay!! Your text is here!!" |
 | Copied to clipboard | "Copied. Go paste it." | "Successfully copied to clipboard." |
-| Wrong PIN | "That PIN didn't open this Space. 3 tries left." | "Houston, we have a problem 🚀" |
+| Wrong PIN | "That PIN didn't open this Space. 3 tries left." | "Houston, we have a problem" |
 | Locked out | "Too many tries. This Space is sealed for 15 minutes." | "Oops! You're locked out lol" |
 | Expired | "Burned up on re-entry. (Expired 2h ago.)" | "Item not found." |
 | Empty Space | "Nothing in orbit. Paste anything." | "No items to display." |
@@ -296,11 +296,11 @@ the layered effects stop.
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
-│ ◉ REZORB   /  WORK-SWAP ●          ◎◎◎ 3 devices   ⏱ 24h  🔒  ⚙ │  ← Space header (accent-tinted)
+│ ◉ REZORB   /  WORK-SWAP ●          ◎◎◎ 3 devices   24h  [L]  [S] │  ← Space header (accent-tinted)
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
 │   ┌────────────────────┐  ┌──────────────┐  ┌────────────────┐   │
-│   │ TEXT · 2m · Laptop │  │ 🖼 IMG · 5m  │  │ 📄 FILE · 1h   │   │  ← Drops (Grid view)
+│   │ TEXT · 2m · Laptop │  │ IMG · 5m     │  │ FILE · 1h      │   │  ← Drops (Grid view)
 │   │ The function you   │  │ [thumbnail]  │  │ report.pdf     │   │
 │   │ asked for is…      │  │              │  │ 2.4 MB         │   │
 │   │      [ COPY ]      │  │ [COPY][SAVE] │  │ [ DOWNLOAD ]   │   │
@@ -402,7 +402,7 @@ Anatomy (top to bottom):
    a `⋯` menu with Pin, Extend lifetime, Download, and Delete.
 
 States: `arriving`, `idle`, `hover` (lifts 2px, shadow grows), `copied`,
-`pinned` (a 📌 sticker and a gold `--flare` border), `expiring` (<10m: the border
+`pinned` (a pin sticker and a gold `--flare` border), `expiring` (<10m: the border
 pulses `--flare`), `uploading` (a progress bar replaces the actions, showing %
 and bytes), `failed` (`--redshift` border, Retry), `burning` (exit animation).
 

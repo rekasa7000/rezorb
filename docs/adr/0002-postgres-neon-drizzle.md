@@ -4,7 +4,7 @@
 
 ## Context
 The current backend uses MongoDB/Mongoose. Rezorb's data is small and
-relational (user → device, space → drop, grant ↔ device). It needs
+relational (user → device, space → drop, grant to device). It needs
 transactional quota accounting and efficient `expires_at` range deletes.
 Vercel's Marketplace has a first-party Neon integration with a database branch
 per preview deployment.
@@ -15,10 +15,10 @@ pooled connection string for the app and the unpooled one for migrations. Use
 the `@neondatabase/serverless` driver, or `pg` with pooling.
 
 ## Consequences
-- ✅ Transactions for quota changes, unique constraints (`owner_id, name_key`), and cheap range indexes.
-- ✅ A DB branch per preview deployment makes reviewing migrations easy.
-- ✅ Better Auth has a first-class Drizzle adapter.
-- ➖ The Mongo models are dropped. There is no production data to migrate.
+- Pro: Transactions for quota changes, unique constraints (`owner_id, name_key`), and cheap range indexes.
+- Pro: A DB branch per preview deployment makes reviewing migrations easy.
+- Pro: Better Auth has a first-class Drizzle adapter.
+- Con: The Mongo models are dropped. There is no production data to migrate.
 
 ## Alternatives considered
 - **MongoDB Atlas + Mongoose** (keep the current stack): works on Vercel, but has weaker
