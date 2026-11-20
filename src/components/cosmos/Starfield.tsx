@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useRef } from "react";
+import { usePrefs } from "@/stores/prefs";
 
 interface Star {
   x: number;
@@ -18,8 +19,12 @@ interface Star {
  */
 export function Starfield() {
   const ref = useRef<HTMLCanvasElement>(null);
+  const calm = usePrefs((s) => s.calm);
 
   useEffect(() => {
+    // Calm mode means no animation loop at all (not just a hidden canvas). The boot script sets
+    // data-calm before first paint, so check it too: the store hydrates a moment later.
+    if (calm || document.documentElement.dataset.calm === "true") return;
     const canvas = ref.current;
     const ctx = canvas?.getContext("2d");
     if (!canvas || !ctx) return;
@@ -120,7 +125,8 @@ export function Starfield() {
       window.removeEventListener("pointermove", onMove);
       document.removeEventListener("visibilitychange", onVisibility);
     };
-  }, []);
+  }, [calm]);
 
+  if (calm) return null;
   return <canvas ref={ref} aria-hidden="true" className="absolute inset-0 h-full w-full" />;
 }
