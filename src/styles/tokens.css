@@ -171,6 +171,15 @@ body {
 }
 
 @layer components {
+  /* Logo art swaps with the theme (Dark shows light art, Daylight shows ink art). */
+  .logo-light { display: none; }
+  :root[data-theme="light"] .logo-dark { display: none; }
+  :root[data-theme="light"] .logo-light { display: inline; }
+  @media (prefers-color-scheme: light) {
+    :root[data-theme="system"] .logo-dark { display: none; }
+    :root[data-theme="system"] .logo-light { display: inline; }
+  }
+
 /* Type utilities (DESIGN §4) */
 .font-display { font-family: var(--font-display), system-ui, sans-serif; letter-spacing: -0.03em; }
 .font-accent { font-family: var(--font-accent), Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: 0; }

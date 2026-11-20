@@ -34,7 +34,7 @@ export default async function Landing() {
   return (
     <div className="overflow-x-clip">
       <header className="mx-auto flex max-w-[1280px] items-center gap-4 px-4 py-5 sm:px-8">
-        <Link href="/" aria-label="Rezorb home" className="text-starlight"><Wordmark className="text-2xl" /></Link>
+        <Link href="/" aria-label="Rezorb home" className="text-starlight"><Wordmark editorial className="text-2xl" /></Link>
         <nav className="ml-auto flex items-center gap-2" aria-label="Account">
           {who ? (
             <Link href="/spaces" className={buttonVariants({ size: "md" })}>Open Launchpad</Link>

@@ -4,15 +4,7 @@ import { useId } from "react";
 export function Orb({ size = 32, ring = "var(--plasma)", className }: { size?: number; ring?: string; className?: string }) {
   const id = useId();
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 64 64"
-      fill="none"
-      role="img"
-      aria-label="Rezorb"
-      className={className}
-    >
+    <svg width={size} height={size} viewBox="0 0 64 64" fill="none" role="img" aria-label="Rezorb" className={className}>
       <defs>
         <radialGradient id={`${id}-g`} cx="35%" cy="30%" r="80%">
           <stop offset="0" stopColor="#ff9be0" />
@@ -37,12 +29,19 @@ export function Orb({ size = 32, ring = "var(--plasma)", className }: { size?: n
   );
 }
 
-export function Wordmark({ className = "" }: { className?: string }) {
+/**
+ * The wordmark, from the outlined SVGs in /public/brand (built by scripts/brand/build-logo.mjs).
+ * Sized in `em`, so the surrounding text-size class (text-xl, text-3xl…) scales it.
+ * The light art shows on Dark, the ink art on Daylight (see `.logo-*` in tokens.css).
+ */
+export function Wordmark({ className = "", editorial = false }: { className?: string; editorial?: boolean }) {
+  const base = editorial ? "rezorb-editorial" : "rezorb-wordmark";
   return (
-    <span className={`font-display inline-flex items-center text-xl font-black tracking-[-0.04em] ${className}`}>
-      <span>REZ</span>
-      <Orb size={22} className="-mx-0.5 translate-y-px" />
-      <span>RB</span>
+    <span role="img" aria-label="Rezorb" className={`logo inline-flex items-center ${className}`}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="logo-dark" src={`/brand/${base}.svg`} alt="" aria-hidden="true" style={{ height: "1.4em", width: "auto" }} />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img className="logo-light" src={`/brand/${base}-ink.svg`} alt="" aria-hidden="true" style={{ height: "1.4em", width: "auto" }} />
     </span>
   );
 }

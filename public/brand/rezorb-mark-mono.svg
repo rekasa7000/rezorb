@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100.0 100.0" width="100" height="100" role="img" aria-label="Rezorb mark"><title>Rezorb mark</title><defs>
+  
+  <clipPath id="m2-t" clipPathUnits="userSpaceOnUse"><rect x="-200" y="-200" width="400" height="234"/></clipPath>
+  <clipPath id="m2-b" clipPathUnits="userSpaceOnUse"><rect x="-200" y="34" width="400" height="300"/></clipPath>
+</defs><g transform="translate(2.94 2.94) scale(1.4706)">
+    <g clip-path="url(#m2-t)"><ellipse cx="32" cy="34" rx="29" ry="9" transform="rotate(-18 32 34)" stroke="currentColor" stroke-width="4" fill="none" opacity="0.55"/></g>
+    <circle cx="32" cy="32" r="17" fill="currentColor"/>
+    <g clip-path="url(#m2-b)"><ellipse cx="32" cy="34" rx="29" ry="9" transform="rotate(-18 32 34)" stroke="currentColor" stroke-width="4" fill="none"/></g>
+  </g></svg>
