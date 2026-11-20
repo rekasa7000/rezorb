@@ -1,6 +1,6 @@
 # ADR-0002: Postgres (Neon) + Drizzle
 
-**Status:** Proposed
+**Status:** Accepted and implemented (founder chose Neon, 2026-11-20)
 
 ## Context
 The current backend uses MongoDB/Mongoose. Rezorb's data is small and
@@ -25,3 +25,13 @@ the `@neondatabase/serverless` driver, or `pg` with pooling.
   transactional ergonomics and no preview branching.
 - **Supabase:** a good all-in-one (it could cover realtime and storage too), but it
   would lock three concerns to one vendor. Reasonable to revisit if you want fewer vendors.
+
+## Update (as built)
+- Driver is plain `pg` (`drizzle-orm/node-postgres`) with a small pool (5 in production), not
+  `@neondatabase/serverless`. It works with Neon's pooled connection string in the Node runtime
+  and lets the same code run against a local Postgres for development and tests.
+- **Developed and tested against Postgres 16 locally; never run against Neon itself.** Run the
+  integration suite against a Neon branch before launch.
+- Founder asked about alternatives on the Vercel Marketplace (Supabase, Prisma Postgres, Aurora,
+  MongoDB Atlas, Convex, Turso…) and chose to stay with Neon.
+

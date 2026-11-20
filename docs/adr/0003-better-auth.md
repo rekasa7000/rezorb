@@ -1,6 +1,6 @@
 # ADR-0003: Better Auth
 
-**Status:** Proposed
+**Status:** Accepted and implemented, with the fallback below
 
 ## Context
 Requirements: email + password, magic link, passkeys, and a **device-pairing**
@@ -26,3 +26,19 @@ Use **Better Auth** with the Drizzle adapter and these plugins: `magicLink`,
 - **Clerk:** fastest to ship and has device/session management, but it's a
   paid, hosted dependency for core identity.
 - **Keep the custom JWT:** we'd have to build magic links, passkeys, and pairing ourselves.
+
+## Update (as built)
+- **Pairing uses the fallback**, a small custom Better Auth plugin (`src/server/pairing-plugin.ts`),
+  not the built-in `device-authorization` plugin. That plugin follows RFC 8628: the polling device
+  receives an OAuth-style access token, not a browser session cookie, and we need the cookie.
+  Design: an 8-character code (unambiguous alphabet) for humans plus a separate 256-bit **secret**
+  that stays in the new browser (only its SHA-256 is stored), so reading the code over a shoulder
+  isn't enough to take the session. Single-use consume via a conditional update. See
+  [ARCHITECTURE §4.7](../ARCHITECTURE.md#47-pairing-a-device).
+- Passkeys are the separate `@better-auth/passkey` package. **Written, not exercised in a browser.**
+- Magic link, email verification: written, **not exercised** (no email provider in development).
+- Email verification is required in production (and when `RESEND_API_KEY` is set); off locally.
+- Better Auth's own rate limiter is configured with `storage: "database"` (a `rate_limit` table),
+  because its default in-memory store doesn't work across serverless instances.
+- The Better Auth CLI is now the `auth` package (`npx auth generate`); `@better-auth/cli` is deprecated.
+

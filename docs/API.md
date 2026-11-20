@@ -11,12 +11,14 @@ runtime. Request and response bodies are JSON, validated with Zod schemas in
 - **Space grant:** every endpoint marked 🔒 also needs a valid `rz_g_{spaceId}`
   cookie (see [ARCHITECTURE § 4.1](ARCHITECTURE.md#41-unlocking-a-space)). If it
   is missing or invalid, the endpoint returns `403 {code: "SPACE_LOCKED"}`.
-- **CSRF:** cookies are `SameSite=Lax`, and all mutations require
-  `Content-Type: application/json` plus an `Origin` header matching the app's
-  origin.
+- **CSRF:** cookies are `SameSite=Lax`; all mutations must send
+  `Content-Type: application/json` (else `415 UNSUPPORTED_MEDIA_TYPE`); and if an
+  `Origin` header is present it must match the app origin (else `403 BAD_ORIGIN`).
+  Browsers always send `Origin` on mutations; non-browser clients (tests, cron) may omit it.
 - **Errors:** `{ "error": { "code": "STRING_CODE", "message": "Human text", "details"?: {} } }`
-- **Rate limit:** responses include `RateLimit-Remaining` and `RateLimit-Reset`.
-  If the limit is exceeded, the endpoint returns `429 {code:"RATE_LIMITED"}`.
+- **Rate limit:** exceeding a limit returns `429 {code:"RATE_LIMITED"}` with a
+  `Retry-After` header (seconds). Limits are listed in [SECURITY.md §4](SECURITY.md#4-rate-limits).
+  (`RateLimit-Remaining` headers are **not** sent.)
 - **Pagination:** cursor-based. Pass `?cursor=<dropId>&limit=50`. Responses
   include `nextCursor`.
 - **Times:** ISO-8601 UTC strings.
@@ -53,10 +55,23 @@ interface DeviceDTO {
 
 | Method | Path | Notes |
 |--------|------|-------|
-| * | `/api/auth/**` | Mounted Better Auth handler: sign-up, sign-in (email/password, magic link, passkey), sign-out, sessions, and device authorization (`/device/code`, `/device/token`, `/device/approve`). |
+| * | `/api/auth/**` | Better Auth: `sign-up/email`, `sign-in/email`, `sign-in/magic-link`, `sign-out`, `verify-email`, passkey routes, `revoke-sessions`, … |
 
-Rezorb adds a hook on session creation: find or create the `device` from the
-`rz_dev` cookie and the User-Agent, then attach `device_id` to the session.
+Rezorb adds a hook on session creation: find or create the `device` from the `rz_dev`
+cookie and the User-Agent, and attach `device_id` to the session. Creating an 11th active
+device fails with `403 QUOTA_DEVICES`.
+
+Better Auth's built-in limiter is on in production (Postgres-backed): sign-in 10 / 10 s,
+sign-up 10 / 60 s, magic link 5 / 60 s per IP, 100 / 10 s default.
+
+### Device pairing (custom plugin, mounted under `/api/auth`)
+
+| Endpoint | Auth | Body → Response |
+|----------|------|-----------------|
+| `POST /pairing/start` | none (IP rate limit 10 / 10 min) | `{}` → `{ userCode: "XXXX-XXXX", secret, expiresAt }`. Keep `secret` private to that browser. |
+| `POST /pairing/poll` | none (120 / min per IP) | `{ userCode, secret }` → `{ status: "pending" \| "approved" \| "denied" \| "expired" }`. On `approved` the response sets the session cookie. Single use. |
+| `POST /pairing/info` | session (10 / 10 min per user) | `{ code }` → `{ userCode, label, kind, geo, requestedAt, expiresAt }` or `404` |
+| `POST /pairing/decide` | session (10 / 10 min per user) | `{ code, approve }` → `{ ok: true }` or `404`/`409` |
 
 ## Spaces
 
@@ -102,7 +117,8 @@ drops, schedules R2 prefix deletion, and publishes `space.deleted`. Returns `204
 ## Drops
 
 ### `GET /api/spaces/:id/drops` 🔒
-`?cursor&limit=50&since=<ISO>` → `{ drops: DropDTO[], nextCursor }`.
+`?cursor&limit=50&since=<ISO>` → `{ drops: DropDTO[], nextCursor, serverTime }`.
+Pass a previous `serverTime` as `since` to get only drops created/updated after it.
 `since` returns drops created or updated after that time. Polling fallback uses it.
 Only unexpired drops with status `ready` are returned, plus any `uploading` drops
 from this device.
@@ -157,13 +173,21 @@ and copy-as-image). Everything else is forced to `attachment`.
 ## Realtime
 
 ### `POST /api/realtime/token`
-Returns an Ably `TokenRequest` with this capability:
+Returns one of:
+
 ```json
-{ "space:{id1}": ["subscribe", "presence"], "space:{id2}": ["subscribe", "presence"],
-  "user:{userId}": ["subscribe"] }
+{ "mode": "poll" }
 ```
-It covers only the Spaces this device currently holds valid grants for. The
-client re-requests a token after unlocking or locking a Space. TTL is 1h.
+(no `ABLY_API_KEY`; the client polls `GET …/drops`), or
+
+```json
+{ "mode": "ably", "tokenRequest": { … }, "spaceIds": ["…"], "userChannel": "user:{id}",
+  "device": { "id": "…", "label": "Chrome on Windows", "kind": "laptop" } }
+```
+The token's capability is `subscribe` + `presence` on `space:{id}` for each Space this
+device currently holds a valid grant for, plus `subscribe` on `user:{userId}`. The Ably
+`clientId` is the **device id**. TTL 1 h; the client re-requests on expiry. A device must
+re-request a token after unlocking another Space. Rate limit 60 / min per user.
 
 ### Realtime events
 
@@ -214,7 +238,18 @@ Returns `{ burned, staleUploads, durationMs }`.
 | `QUOTA_SPACES` / `QUOTA_STORAGE` / `QUOTA_DEVICES` | 403 | Limit reached |
 | `NOT_FOUND` | 404 | Also returned for resources the user doesn't own |
 | `NAME_TAKEN` | 409 | |
+| `NOT_YOURS` | 403 | Only the uploading device can complete an upload |
+| `BAD_ORIGIN` | 403 | `Origin` header doesn't match the app |
+| `UNSUPPORTED_MEDIA_TYPE` | 415 | Mutations must be `application/json` |
+| `CONFIRM_MISMATCH` | 422 | Space delete: typed name didn't match |
+| `INTERNAL` | 500 | Unexpected; the cause is logged without content |
 | `TOO_LARGE` | 413 | |
 | `WEAK_PIN` / `VALIDATION` / `SIZE_MISMATCH` | 422 | |
 | `SPACE_SEALED` | 423 | Lockout active |
 | `RATE_LIMITED` | 429 | |
+
+## Dev-only
+
+`GET|PUT /api/dev-storage/:token`: local stand-in for R2 presigned URLs. Tokens are
+HMAC-signed and expire; the route returns **404 unless R2 is unconfigured and
+`NODE_ENV !== "production"`** (or the e2e switch is on). Never reachable on a real deploy.

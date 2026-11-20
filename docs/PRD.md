@@ -1,6 +1,13 @@
 # Rezorb — Product Requirements (v1)
 
-Status: **Draft for build** · Owner: founder · Last updated: 2026-11-20
+Status: **v1 built (not deployed)** · Owner: founder · Last updated: 2026-11-20
+
+> **Implementation status:** every v1 user story in §6 is implemented and exercised by tests
+> against local services, except where [ROADMAP.md](ROADMAP.md) marks a piece 🟡 (written, not
+> yet run against the real service: email verification, magic link, passkeys, Ably, R2) or ⬜
+> (account deletion, data export, CSP, CI). Where the build chose differently from this
+> document, [ARCHITECTURE.md §9](ARCHITECTURE.md#9-decisions-that-departed-from-the-original-plan)
+> says so.
 
 ## 1. Problem
 

@@ -1,83 +1,103 @@
 # Rezorb — Security & Privacy
 
+Status legend: ✅ implemented **and tested** · 🟡 implemented, **not** exercised against the real
+service · ⬜ **not implemented yet**.
+
 ## 1. What we protect
 
 | Asset | Why it matters |
 |-------|----------------|
-| Drop contents (text, images, files) | These are personal, often sensitive (AI output, documents, photos) |
-| Account sessions | A session gives access to the Launchpad |
-| Space PINs | They are the second lock on every Space |
-| The device list | It reveals which machines a person uses |
+| Drop contents (text, images, files) | Personal, often sensitive (AI output, documents, photos) |
+| Account sessions | A session opens the Launchpad |
+| Space PINs | The second lock on every Space |
+| The device list | Reveals which machines a person uses |
 
 ## 2. Threat model
 
-| # | Threat | Mitigation |
-|---|--------|------------|
-| T1 | **Session left open on a shared or work machine** | The PIN is required per Device, and Space grants expire after 12h idle. "Lock" is always visible. Devices can be revoked remotely, which kills sessions and grants and signs out live through `device.revoked`. |
-| T2 | **PIN brute force** | Argon2id hashing. 5 failures per Space trigger a lockout of 15m, which doubles each time up to 24h. Per-user (10/min) and per-IP (30/min) rate limits. Lockouts publish `space.sealed` and send an email alert. Weak PINs are rejected. |
-| T3 | **Space name enumeration** | Names are scoped per user, so you can only ever probe your own. Unknown names and wrong PINs get the same response and the same timing (a dummy Argon2 verify runs). |
-| T4 | **Account takeover** | Passwords are hashed with scrypt (Better Auth default), passkeys are supported, and email is verified. Rate-limited sign-in. Breached-password check (HIBP k-anonymity) at sign-up. Pairing codes expire after 10 minutes and need explicit approval showing the requesting browser and OS. |
-| T5 | **Pairing phishing** (attacker gets the user to approve the attacker's code) | The approval screen shows the requesting device's browser, OS, approximate location (from Vercel geo headers), and time, with the copy: "Only approve if you are looking at this code on your own screen right now." |
-| T6 | **Malicious content served from our origin (XSS)** | Text is always rendered as text. Shiki output is the only generated HTML, and it comes from a trusted library. Files are always served from the R2 domain, never our origin, with `attachment` disposition. Only image MIME types may be inline. There is a strict CSP. |
-| T7 | **Realtime injection or eavesdropping** | Clients get subscribe/presence-only Ably tokens scoped to Spaces with valid grants. Only the server publishes. |
-| T8 | **Presigned URL leakage** | PUT URLs live for 5 minutes and are bound to one exact key and content type. GET URLs live for 60 seconds and are minted per request after a grant check. |
-| T9 | **Storage abuse / cost blow-up** | Quotas (50 MB/file, 1 GB/user, 10 Spaces), expiry, stale-upload cleanup, and an R2 lifecycle backstop. v1 has no public links, so the service can't be used as a public file host. |
-| T10 | **CSRF** | `SameSite=Lax` cookies, `Origin` checks, and a JSON content type required on all mutations. |
-| T11 | **Insider / server compromise reads content** | v1: data is encrypted at rest (Neon and R2 default) and access is limited. v2: **E2E encryption** so the server sees only ciphertext ([ADR-0007](adr/0007-e2e-encryption-v2.md)). |
-| T12 | **Clipboard over-reach** | We never read the clipboard without a user gesture. We use the `paste` event, not `navigator.clipboard.read()` polling. The empty-state "clipboard type hint" only appears if permission is already granted. |
+| # | Threat | Mitigation | Status |
+|---|--------|------------|--------|
+| T1 | **Session left open on a shared/work machine** | PIN required per device; grants expire after 12 h idle; "Lock" always visible; devices revocable remotely (sessions deleted, grants revoked, live sign-out). | ✅ (revoke, grant expiry, lock, per-device binding: integration + e2e) |
+| T2 | **PIN brute force** | Argon2id; 5 failures → sealed 15 min, doubling to 24 h, counted under a row lock (concurrent guesses can't dodge it); per-user 10/min and per-IP 30/min limits; weak PINs rejected; lockout emails the owner. | ✅ (lockout math, concurrency, rate limit, "sealed refuses the right PIN"). Email: 🟡 |
+| T3 | **Space-name enumeration** | Names are per-user (you only probe your own); unknown name and wrong PIN return the same code/message and run a dummy Argon2 verify so timing matches. | ✅ response shape · timing equality is by construction, **not benchmarked** |
+| T4 | **Account takeover** | scrypt password hashing (Better Auth), ≥ 10-char passwords, email verification required in production, passkeys, Postgres-backed auth rate limits. | ✅ password sign-in · 🟡 verification email, passkeys, magic link · ⬜ breached-password check (Better Auth has a `haveIBeenPwned` plugin; not enabled) |
+| T5 | **Pairing phishing** | Approval screen shows browser, OS, rough location and time with "Only approve if you are looking at this code on your own screen"; 10-minute TTL; single use; the 256-bit **secret** never leaves the new device, so seeing the code isn't enough; approve/lookup limited to 10 / 10 min per user. | ✅ (approve, decline, expiry, wrong secret, replay, limit) |
+| T6 | **Malicious content served from our origin (XSS)** | Text is always rendered as text; the only generated HTML is Shiki's output (escaped by the library); downloads redirect to the storage domain with `attachment` + `application/octet-stream`; only png/jpeg/webp/gif may be inline; `nosniff`. | ✅ (`<script>` stored verbatim; HTML forced to attachment) · ⬜ **no CSP yet** |
+| T7 | **Realtime injection / eavesdropping** | Server-only publishing; client tokens are `subscribe`+`presence` scoped per granted Space. | 🟡 (no Ably key was available; the code path is compiled and reviewed, **not run**) |
+| T8 | **Presigned URL leakage** | PUT 5 min, GET 60 s, minted per request after a grant check; keys are server-chosen. | ✅ contract on the filesystem stand-in · 🟡 real R2 |
+| T9 | **Storage abuse / cost** | 50 MB/file, 1 GB/user, 10 Spaces, 500 drops/Space, expiry, stale-upload cleanup, R2 lifecycle backstop. No public links in v1. | ✅ (quota, cap, stale cleanup) · 🟡 R2 lifecycle rule |
+| T10 | **CSRF** | `SameSite=Lax`; JSON-only mutations (415 otherwise); `Origin` must match when present. | ✅ |
+| T11 | **Insider / server compromise reads content** | v1: provider encryption at rest only. v2: E2E ([ADR-0007](adr/0007-e2e-encryption-v2.md)). The landing page says E2E is **not** in place yet. | ⬜ (by design for v1) |
+| T12 | **Clipboard over-reach** | Reads only inside a `paste` event or a user gesture; never polls the clipboard. | ✅ |
+| T13 | **Cross-user / cross-space access** | Every Space/drop route requires a grant bound to (user, device, space, `pin_version`); strangers get 403/404; a grant for Space A can't open B; cookie forgery and replay across users/devices rejected. | ✅ (several integration tests) |
+| T14 | **Cron abuse** | `/api/cron/burn` needs `Authorization: Bearer $CRON_SECRET` (constant-time compare); **closed** when the secret isn't set. | ✅ |
 
 ## 3. Cookies
 
 | Cookie | Purpose | Flags |
 |--------|---------|-------|
-| `better-auth.session_token` | Session | HttpOnly, Secure, SameSite=Lax |
-| `rz_dev` | Stable device ID | HttpOnly, Secure, SameSite=Lax, signed, 1 year |
-| `rz_g_{spaceId}` | Space grant | HttpOnly, Secure, SameSite=Lax, signed (HMAC-SHA256 with `GRANT_SECRET`), expires with the grant |
+| `better-auth.session_token` | Session | HttpOnly, SameSite=Lax, Secure in production |
+| `rz_dev` | Stable device id | HttpOnly, SameSite=Lax, Secure in production, 1 year. **Unsigned on purpose**: a forged id for another user's device is ignored (lookup requires `device.user_id = session user`), it just creates a new device. |
+| `rz_g_{spaceId}` | Space grant | HttpOnly, SameSite=Lax, Secure in production; value `grantId.HMAC-SHA256(GRANT_SECRET)`; expires with the grant |
 
-## 4. HTTP headers
+`GRANT_SECRET` rotation: set the new value as `GRANT_SECRET` and the old one as
+`GRANT_SECRET_PREV`; both verify, only the new signs. Remove the old one after ~12 h.
 
-Set in `next.config.ts` and middleware:
+## 4. Rate limits
 
-```
-Content-Security-Policy:
-  default-src 'self';
-  script-src 'self' 'nonce-{n}' 'strict-dynamic';
-  style-src 'self' 'unsafe-inline';
-  img-src 'self' blob: data: https://*.r2.cloudflarestorage.com;
-  connect-src 'self' https://*.r2.cloudflarestorage.com https://*.ably.io wss://*.ably.io https://*.ably-realtime.com wss://*.ably-realtime.com;
-  font-src 'self';
-  frame-ancestors 'none';
-  base-uri 'self';
-  form-action 'self';
-Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
-X-Content-Type-Options: nosniff
-Referrer-Policy: strict-origin-when-cross-origin
-Permissions-Policy: camera=(), microphone=(), geolocation=(), clipboard-read=(self), clipboard-write=(self)
-```
+| Rule | Limit | Key |
+|------|-------|-----|
+| Unlock / PIN change | 10 / min | user |
+| Unlock | 30 / min | IP |
+| Create Space | 20 / hour | user |
+| Beam text | 120 / min | user |
+| Start upload | 60 / min | user |
+| Download | 300 / min | user |
+| Realtime token | 60 / min | user |
+| Pairing start | 10 / 10 min | IP |
+| Pairing poll | 120 / min | IP |
+| Pairing info/decide | 10 / 10 min | user |
+| Better Auth: sign-in / sign-up / magic link / default | 10 per 10 s / 10 per 60 s / 5 per 60 s / 100 per 10 s | IP (Postgres-backed) |
 
-## 5. Privacy
+Our limits use Upstash Redis in production and fall back to a **per-instance in-memory**
+window without it (fine for dev; weak on serverless, so configure Upstash). If Redis is
+down the limiter fails open to the in-memory window rather than blocking everyone.
 
-- **Content is never logged.** Logs contain IDs, kinds, sizes, and durations only.
-  Sentry has `sendDefaultPii: false`, and request bodies are scrubbed.
-- **No third-party trackers.** We use Vercel Analytics (cookieless) only.
-- **Retention:** Drops are deleted at expiry. A deleted Space is purged within
-  1h. A deleted account has all data purged within 24h, including R2 prefixes.
-- **Data export:** Settings has an "Export everything in orbit" option that
-  produces a zip of all current Drops.
-- **Workplace notice:** shown once per Device after first sign-in:
-  > "Rezorb is for moving your own things between your own devices. If this is a
-  > work computer, your organization's data policies still apply."
+## 5. HTTP headers
 
-## 6. Secrets
+Set in `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy:
+strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` (camera,
+microphone, geolocation off; clipboard self), `Strict-Transport-Security` (2 years,
+preload). ✅
 
-All secrets are Vercel environment variables, scoped per environment. They are
-never exposed with the `NEXT_PUBLIC_` prefix. The full list is in
-[DEPLOYMENT.md](DEPLOYMENT.md#environment-variables). Rotate `GRANT_SECRET` by
-supporting two keys (`GRANT_SECRET`, `GRANT_SECRET_PREV`) during rollover.
+**⬜ Content-Security-Policy is not implemented.** The plan is a nonce-based policy
+(`script-src 'self' 'nonce-…' 'strict-dynamic'`, `connect-src` for the app, R2 and Ably,
+`img-src 'self' blob: data:` + the R2 host, `frame-ancestors 'none'`). It needs a request
+proxy to mint nonces and care with the inline theme-boot script. It's the biggest open
+item in [ROADMAP M8](ROADMAP.md#m8--launch-hardening); don't launch without it.
 
-## 7. Before any sharing feature (v2) ships
+## 6. Privacy
 
-- [ ] Malware scanning on uploads (for example Cloudflare or a ClamAV worker) before anything is shared
+- **Content is never logged** (`src/server/log.ts` takes IDs, kinds, sizes and durations;
+  file names and text are never passed to it). Errors are logged as name + message only. ✅
+- No third-party trackers in the app. (Vercel Analytics / Sentry not added yet.)
+- **Retention:** Drops are deleted at expiry (rows and blobs). Deleting a Space deletes its
+  rows and R2 prefix immediately. ✅ (tested) · ⬜ **Account deletion and data export are not
+  built yet.**
+- **Workplace notice**, shown once per device after first sign-in, and on the landing page: ✅
+  > "Rezorb is for moving your own things between your own devices. If this is a work
+  > computer, your organization's data policies still apply."
+- The landing page says plainly that Drops are **not end-to-end encrypted yet**.
+
+## 7. Secrets
+
+All secrets are environment variables, scoped per environment, never `NEXT_PUBLIC_`.
+List and rotation notes: [DEPLOYMENT.md](DEPLOYMENT.md#2-environment-variables).
+`REZORB_E2E=1` relaxes production-only requirements for the Playwright run and **throws if
+`VERCEL_ENV=production`**; never set it anywhere real.
+
+## 8. Before any sharing feature (v2) ships
+
+- [ ] Malware scanning on uploads before anything is shared
 - [ ] Abuse reporting and takedown flow, plus a DMCA contact
 - [ ] CSAM hash-matching for shared images
 - [ ] Per-link rate limits and expiry

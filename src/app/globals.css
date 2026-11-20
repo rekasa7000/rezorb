@@ -1,0 +1,25 @@
+@import "tailwindcss";
+@import "../styles/tokens.css";
+
+@theme inline {
+  --color-void: var(--void);
+  --color-abyss: var(--abyss);
+  --color-hull: var(--hull);
+  --color-hull-2: var(--hull-2);
+  --color-starlight: var(--starlight);
+  --color-moondust: var(--moondust);
+  --color-dim: var(--dim);
+  --color-nebula: var(--nebula);
+  --color-plasma: var(--plasma);
+  --color-ion: var(--ion);
+  --color-flare: var(--flare);
+  --color-aurora: var(--aurora);
+  --color-redshift: var(--redshift);
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-accent: var(--space-accent);
+  --color-line: var(--line);
+  --font-display: var(--font-display);
+  --font-ui: var(--font-ui);
+  --font-mono: var(--font-mono);
+}

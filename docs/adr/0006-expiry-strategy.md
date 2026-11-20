@@ -1,6 +1,6 @@
 # ADR-0006: Layered expiry
 
-**Status:** Proposed
+**Status:** Accepted and implemented
 
 ## Context
 Drops expire after 1h, 24h, or 7d. Vercel Cron on the **Hobby** plan runs at most
@@ -26,3 +26,12 @@ Five layers:
 - ➖ On Hobby, quota numbers may include expired-but-unburned bytes for up to a
   day. The quota check therefore sums only unexpired drops.
 - Note: Vercel Hobby is for non-commercial use. Move to Pro before charging money.
+
+## Update (as built)
+- Layers 1–4 exist and are tested: read-time filter, client timers (the burn ring), the cron route
+  (`Bearer CRON_SECRET`, closed when unset, idempotent), and the opportunistic burn via `after()` when
+  a Space's first page is listed. The R2 lifecycle rule is deployment configuration (untested).
+- Quota no longer depends on cleanup having run ([ADR-0008](0008-quota-by-sum.md)).
+- The committed cron schedule is **daily** (`0 3 * * *`): Vercel rejects Hobby deployments with anything
+  more frequent. On Pro, change it to hourly (`0 * * * *`).
+

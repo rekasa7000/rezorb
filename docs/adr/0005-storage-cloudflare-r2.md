@@ -1,6 +1,6 @@
 # ADR-0005: Cloudflare R2 with presigned URLs
 
-**Status:** Proposed
+**Status:** Accepted; implemented, **not yet run against R2**
 
 ## Context
 Files up to 50 MB must not pass through Vercel functions (4.5 MB body limit).
@@ -31,3 +31,14 @@ origins only.
   remove a vendor.
 - **AWS S3:** equivalent API, but has egress costs.
 - **Cloudinary** (current): poor fit for arbitrary files and private access.
+
+## Update (as built)
+- Presigned PUTs sign the content type but **not** the content length, so the server runs a
+  `HEAD` on `complete` and rejects (and deletes) any upload whose size differs from what was declared.
+- Multipart needs `ExposeHeaders: ["ETag"]` in the bucket's CORS rule, or the browser can't read part
+  ETags (the client throws a clear error saying so).
+- The SDK is configured with `requestChecksumCalculation: "WHEN_REQUIRED"`, since R2 rejects the
+  SDK's newer default checksum headers on presigned URLs.
+- A **filesystem stand-in** with the same interface serves local development and the whole test
+  suite (see [ADR-0009](0009-dev-fallbacks-and-test-switch.md)). R2 specifics are untested.
+

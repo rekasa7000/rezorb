@@ -2,48 +2,68 @@
 
 > **Throw it into space. Catch it on the other side.**
 
-Rezorb is a private, floating **Space** between your own devices. Open the same
-Space on your work laptop and your personal laptop (or phone), **paste on one,
-and catch it on the other** within a second. It handles text, AI answers, code,
-screenshots, photos, and files. There's nothing to install and no emailing
-yourself.
+Rezorb is a private, floating **Space** between your own devices. Open the same Space on your
+work laptop and your personal laptop (or phone), **paste on one, and catch it on the other**.
+It handles text, AI answers, code, screenshots, photos and files. There's nothing to install and
+no emailing yourself.
 
-- 🔒 Every Space is locked with a **name + PIN**, on top of your account.
-- ⏱ Drops **burn up** automatically after 1h, 24h, or 7d.
-- 🛰 **Realtime**: see which of your devices are in the Space right now.
-- 🌌 A loud, maximalist space aesthetic, with a **Calm mode** for the office.
+- 🔒 Every Space is locked with a **name + PIN**, on top of your account (Argon2id, lockout, per-device grants).
+- ⏱ Drops **burn up** automatically after 1 hour, 24 hours or 7 days.
+- 🛰 **Realtime** presence: see which of your devices are in the Space.
+- 📲 **Pair a device with a code or QR**, so you never type a password on a machine you don't trust.
+- 🌌 A loud, maximalist space aesthetic with a **Calm mode** for the office, plus a Daylight theme.
 
-> **Status:** planning complete, build starting. The `frontend/` (Vite) and
-> `backend/` (Express) folders are the legacy *Zorb* prototype. They will be
-> replaced by a single Next.js app in milestone M0.
+> **Status:** v1 is built and tested locally (33 unit, 49 integration, 9 end-to-end tests, axe-clean
+> in both themes). It has **not been deployed**, and Neon, R2, Ably, Resend and Upstash have not
+> been exercised for real. Read [docs/TESTING.md](docs/TESTING.md#not-verified) and
+> [docs/ROADMAP.md](docs/ROADMAP.md) before launching. **Don't launch without a CSP.**
+
+## Quick start
+
+Requires Node ≥ 20.19, pnpm, and a Postgres (15+).
+
+```bash
+pnpm install
+cp .env.example .env.local        # set DATABASE_URL, BETTER_AUTH_SECRET, GRANT_SECRET
+createdb rezorb && pnpm db:migrate
+pnpm dev                          # http://localhost:3000
+```
+
+With nothing else configured, files are stored on disk, realtime falls back to polling, email is
+printed to the console, and sign-up signs you straight in. To try it: sign up, make a Space, then
+open a private window, sign in, and unlock the same Space.
+
+| Command | What it does |
+|---------|--------------|
+| `pnpm test` | Unit tests |
+| `pnpm test:int` | Integration tests against Postgres (`rezorb_test`) |
+| `pnpm e2e` | Playwright, two browser contexts = two devices |
+| `pnpm typecheck` / `pnpm lint` | |
+| `pnpm db:generate` / `pnpm db:migrate` | Drizzle migrations |
+
+## Stack
+
+Next.js 16 (App Router) · React 19 · TypeScript 5.9 · Tailwind v4 · Motion · TanStack Query ·
+Zustand · Zod · Drizzle + Postgres (Neon) · Better Auth · Ably · Cloudflare R2 · Upstash Redis ·
+Resend · Vercel.
 
 ## Documentation
 
 | Doc | What's in it |
 |-----|--------------|
 | [docs/PRD.md](docs/PRD.md) | Problem, positioning, decisions, user stories, limits, metrics |
-| [DESIGN.md](DESIGN.md) | The maximalist design system: brand, color, type, motion, components, Calm mode |
+| [DESIGN.md](DESIGN.md) | The maximalist design system: brand, colour, type, motion, components, Calm mode, as-built notes |
 | [CONTEXT.md](CONTEXT.md) | Domain vocabulary (Space, Drop, Beam, Grant, …) |
-| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | System design on Vercel, source layout, key flows |
-| [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Postgres schema and invariants |
+| [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) | The system as built: flows, layout, fallbacks, departures from the plan |
+| [docs/DATA_MODEL.md](docs/DATA_MODEL.md) | Postgres schema, invariants, quota accounting |
 | [docs/API.md](docs/API.md) | REST and realtime contract |
-| [docs/SECURITY.md](docs/SECURITY.md) | Threat model, headers, privacy |
+| [docs/SECURITY.md](docs/SECURITY.md) | Threat model with implemented / tested / open status |
 | [docs/adr/](docs/adr/README.md) | Architecture decision records |
-| [docs/ROADMAP.md](docs/ROADMAP.md) | Milestones M0–M8 and the v2 backlog |
-| [docs/TESTING.md](docs/TESTING.md) | Test strategy and release gates |
-| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, Neon, R2, Ably, and the environment variables |
+| [docs/ROADMAP.md](docs/ROADMAP.md) | Milestone status (done / unverified / open) and the v2 backlog |
+| [docs/TESTING.md](docs/TESTING.md) | What the tests prove, and what they don't |
+| [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, Neon, R2, Ably, env vars, first-deploy checklist |
 
-## Stack
+## History
 
-Next.js (App Router) · TypeScript · Tailwind v4 · shadcn/ui · Motion ·
-TanStack Query · Zustand · Zod · Drizzle + Neon Postgres · Better Auth ·
-Ably · Cloudflare R2 · Upstash Redis · Resend · Vercel
-
-## Quick start (after M0)
-
-```bash
-pnpm install
-cp .env.example .env.local
-pnpm db:migrate
-pnpm dev
-```
+This repo began as *Zorb*, a Vite + Express + MongoDB chat prototype. That code is preserved at
+commit `3c84314` (the last commit before the restructure).

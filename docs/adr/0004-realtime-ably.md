@@ -1,6 +1,6 @@
 # ADR-0004: Ably for realtime
 
-**Status:** Proposed
+**Status:** Accepted; implemented but **not yet run against Ably**
 
 ## Context
 Text pasted on one device must appear on another in under 1s (p95). Vercel
@@ -27,3 +27,12 @@ connection drops, the client falls back to polling with `?since=`.
 - **PartyKit / Cloudflare Durable Objects:** most flexible, but it means a second
   deploy target.
 - **Polling only:** simplest, but misses the "instant" promise.
+
+## Update (as built)
+- Without `ABLY_API_KEY` the token route answers `{mode:"poll"}` and the client polls every 2.5 s.
+  This is also the **safety net** when Ably is configured but unreachable for 10 s, and it is how a
+  device in poll mode learns it lost access (PIN changed, device revoked, Space deleted).
+- All end-to-end tests ran in poll mode (time-to-catch ≈ 2.7–2.9 s). The sub-second target is
+  **unmeasured** until an Ably key is available.
+- Ably `clientId` = device id, so presence maps directly onto the Constellation.
+

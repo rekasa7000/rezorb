@@ -87,7 +87,7 @@ tint. That keeps contrast high even when the screen is busy.
 | `--hull-2` | `#251A4D` | Hover / pressed surfaces. |
 | `--starlight` | `#F5F1FF` | Primary text on dark. |
 | `--moondust` | `#B9B0D9` | Secondary text. |
-| `--dim` | `#7C72A3` | Tertiary text, disabled. **Only for ≥ 18px or non-essential text.** |
+| `--dim` | `#8F86B5` | Tertiary text, helper text, disabled. Passes AA (≥ 4.5:1) on `--abyss` and `--hull`; verified with axe. *(Was `#7C72A3` at ~4.2:1, which failed on small text.)* |
 | `--nebula` | `#FF3DB8` | Brand primary (hot magenta). Primary buttons, focus glow. |
 | `--plasma` | `#8B5CFF` | Brand secondary (electric violet). Links, ring of the Orb, selection. |
 | `--ion` | `#2DF5FF` | Live / realtime / presence. "Something is happening right now." |
@@ -116,6 +116,10 @@ tint. That keeps contrast high even when the screen is busy.
   `backdrop-filter: blur(12px)`.
 - State is never conveyed by color alone. Every state color comes with an
   icon *and* a word.
+- **These rules are enforced, not aspirational:** the Playwright suite runs axe (WCAG 2.2 AA)
+  on the landing, auth, Launchpad, Space and Settings screens in **both** Dark and Daylight.
+  Decorative large numerals (the "01 02 03" on the landing page) are `aria-hidden` and still
+  meet large-text contrast.
 
 ### 3.4 Light theme ("Daylight")
 
@@ -462,16 +466,19 @@ toggle Calm mode, toggle Float/Grid, copy latest Drop, and open settings. It use
 
 ### 10.1 Calm mode
 
-Toggle it in the header (a moon icon), in Settings, or with `Shift+C`. The
-setting is stored per device, because you probably want it on your work laptop
-and off at home.
+Toggle it in the header (a moon icon; **hidden below 640px to give the Space title room**),
+in Settings → Appearance, in the command palette, or with `Shift+C`. The setting is stored per
+device, because you probably want it on your work laptop and off at home.
 
 Calm mode:
 - removes the Starfield, Nebula, Grain, ornaments, stickers on chrome, and Float view;
 - replaces the gradients with flat `--abyss`;
-- sets every motion duration to 0 except a 120ms opacity fade;
-- mutes the Space accent to 40% saturation;
+- sets every motion duration to 0 except a 120ms opacity fade (this is the *only* animation
+  allowed, and a test asserts it, including for a newly arrived Drop);
 - keeps all functionality, keyboard shortcuts, and state indicators.
+
+*Not built:* muting the accent to 40% saturation. Calm keeps the accent border but drops the
+hard offset shadow, which already reads as much quieter.
 
 ### 10.2 Reduced motion
 
@@ -511,7 +518,7 @@ Target **WCAG 2.2 AA**.
 
 - Every decorative layer (starfield, nebula, grain, ornaments) is
   `aria-hidden="true"` and `pointer-events: none`.
-- Drops are an `role="feed"` of `article`s. New arrivals are announced through a
+- Drops are a `role="feed"` (a `div`, not a `ul`; axe rejects `li` inside a feed) of `article`s. New arrivals are announced through a
   polite live region: "New text from Phone".
 - Focus ring: `outline: 3px solid var(--ion); outline-offset: 3px` on all
   interactive elements. Never removed.
@@ -532,26 +539,51 @@ Target **WCAG 2.2 AA**.
   mapped into Tailwind v4 via `@theme inline`. Components never use raw hex.
 - **Fonts** come through `next/font/google` in `src/app/fonts.ts` and are exposed
   as `--font-display`, `--font-accent`, `--font-ui`, and `--font-mono`.
-- **Starfield:** port the existing `AestheticsCanvas.tsx` to
-  `src/components/cosmos/Starfield.tsx`. Pause it when the tab is hidden
-  (`visibilitychange`), cap it at 30fps, and use a density of ~1 star / 9,000px².
-  It is disabled in Calm mode.
+- **Starfield** (`src/components/cosmos/Starfield.tsx`, ported from the legacy
+  `AestheticsCanvas`): pauses when the tab is hidden, capped at 30 fps, ~1 star / 9,000 px²
+  (60–260 stars), pointer parallax, and freezes on a still frame if frames stay slow for 3 s.
+  Hidden in Calm mode; holds still under `prefers-reduced-motion`.
+- **CSS layering matters.** `tokens.css` puts element defaults in `@layer base` and the
+  `.panel/.hull/.cargo/.sticker/…` classes in `@layer components`, so Tailwind utilities
+  (which come later) can override them (`outline-none`, `p-4`, …). Unlayered CSS silently
+  beats every utility; an early version had this bug and needed `!important` hacks.
+  Calm-mode overrides are deliberately `!important`.
 - **Grain:** an inline SVG `feTurbulence` (baseFrequency 0.8, 2 octaves)
   rendered once as a CSS `background-image` data URI.
 - **Performance budget for decoration:** ≤ 4ms main-thread time per frame on a
   mid-range laptop. If the frame rate drops below 40fps for 3 seconds, the app
   automatically falls back to static layers.
-- **Stickers and ornaments** are a single `<Ornament kind="…"/>` component
-  so Calm mode can drop them all at once.
+- **Stickers and ornaments** (`Sticker`, `OrbitLines`, `Halftone`, `Coordinates`, `Marquee` in
+  `Ornament.tsx`) all carry the `.ornament`/`.marquee` class, which Calm mode hides in one rule.
+  They are `aria-hidden`.
+- **Components are hand-written** (`Button`, `Input`/`Field`, `Dialog`) on the tokens rather than
+  shadcn/ui: the look is too custom to be worth fighting a component library for.
 
 ---
 
 ## 14. Asset checklist
 
-- [ ] Orb glyph SVG (mono + color)
-- [ ] Wordmark SVG (horizontal, stacked)
-- [ ] Favicon set (`icon.svg`, `apple-icon.png`, `favicon.ico`)
-- [ ] OG image template (`opengraph-image.tsx` with `@vercel/og`): mega wordmark on nebula
-- [ ] Halftone planet SVG pattern
-- [ ] Custom glyphs: Dock, Beam, Burn, Constellation, Pair
-- [ ] Empty-state illustration (outline Orb + orbit lines)
+- [x] Orb glyph (inline SVG `Orb`, uses the tokens so it themes)
+- [x] Wordmark (`Wordmark`: R-E-Z + Orb + R-B)
+- [x] Favicon (`src/app/icon.svg`). *Not done:* `apple-icon.png`, `favicon.ico`
+- [x] OG image (`opengraph-image.tsx`, `next/og`)
+- [x] Halftone planet (CSS radial-gradient pattern, `Halftone`)
+- [ ] Custom glyphs: Dock, Beam, Burn, Constellation, Pair (stock `lucide-react` icons are used)
+- [x] Empty-state art (dashed spinning ring + orbit lines, in CSS/SVG)
+- [ ] Stacked wordmark lockup and brand guidelines page
+
+---
+
+## 15. As built: notable differences from the spec above
+
+| Spec | Built |
+|------|-------|
+| Cards: meta on one row | Two rows (kind sticker + burn ring, then "5m ago · Chrome on Windows") so nothing truncates on narrow cards |
+| Dock: translucent panel | **Opaque** `--abyss` (translucent let card text bleed through on phones); the focus ring is drawn on the whole panel, not the textarea |
+| Dock placeholder cycles Ctrl+V hints | Cycles on desktop; on touch devices it says "Type or paste a note…" / "Attach a photo or file…" |
+| Space header: Calm toggle always visible | Hidden under 640px (see §10.1) |
+| Float view: loose placement + drift | Wrapped cards with a deterministic per-card tilt and a 7 s bob; opt-in, desktop only |
+| PIN keypad: 6 slots | 6 slots that grow to 8 as you type; on-screen 3×4 keypad only on `pointer: coarse` |
+| Command palette | `cmdk`, with: copy latest, lock, Calm, view, settings, Launchpad, shortcuts |
+| "Burn-up" particles / "slap" sticker | The card scales and fades with a grayscale shift on exit; the "COPIED" state is the button turning aurora. No ember particles yet |
+| Unlock animation (keypad splits open) | Not built; the shake on a wrong PIN and the lockout countdown are |

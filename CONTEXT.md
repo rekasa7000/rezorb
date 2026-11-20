@@ -28,3 +28,8 @@ here, don't invent a synonym; add it here first.
 | **Pairing** | Signing in a new Device by approving a short code from an already-signed-in Device, with no password typed on the new Device. | `pairing` |
 | **Calm mode** | A per-Device low-distraction visual mode. | `prefs.calm` |
 | **Quota** | Limits per User: storage bytes in orbit, max file size, number of Spaces. | `quota` |
+| **Poll mode** | Realtime fallback: the feed refetches every 2.5 s instead of listening to Ably. Used without an Ably key, and when Ably is unreachable for 10 s. | `connection === "polling"` |
+| **Opportunistic burn** | Burning a Space's expired Drops when its first page is listed, so cleanup doesn't wait for the cron. | `burnExpiredInSpace()` |
+| **User code / secret** | The two halves of a pairing: the short human-readable code shown on the new device and the 256-bit secret that never leaves it. Both are needed to take the session. | `pairing.userCode`, `secret` |
+| **Calm / Daylight** | Per-device display modes. Calm removes all visual flourish; Daylight is the light theme. | `prefs.calm`, `prefs.theme` |
+
