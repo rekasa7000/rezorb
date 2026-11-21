@@ -3,6 +3,9 @@
 Legend: **Done** = built and tested. **Unverified** = built, **not yet verified against the real service**.
 **Open** = not done. Last updated 2026-11-20.
 
+See also: [RELEASE_PLAN.md](RELEASE_PLAN.md) for the ordered list of what to build before release, and
+[MARKET.md](MARKET.md) for the market model behind that order.
+
 ## At a glance
 
 | Milestone | Status |

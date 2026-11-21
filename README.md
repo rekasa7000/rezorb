@@ -62,6 +62,8 @@ Resend · Vercel.
 | [docs/ROADMAP.md](docs/ROADMAP.md) | Milestone status (done / unverified / open) and the v2 backlog |
 | [docs/TESTING.md](docs/TESTING.md) | What the tests prove, and what they don't |
 | [docs/DEPLOYMENT.md](docs/DEPLOYMENT.md) | Vercel, Neon, R2, Ably, env vars, first-deploy checklist |
+| [docs/MARKET.md](docs/MARKET.md) | Market sizing (TAM, SAM, SOM), revenue scenarios, pricing, unit economics, scaling stages |
+| [docs/RELEASE_PLAN.md](docs/RELEASE_PLAN.md) | What stands between the current code and a first release, in priority order |
 | [docs/ASSETS.md](docs/ASSETS.md) | "Vogue in orbit" art direction, the logo set, and every image prompt to generate |
 
 ## History
