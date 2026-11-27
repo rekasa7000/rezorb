@@ -178,7 +178,7 @@ Returns one of:
 ```json
 { "mode": "poll" }
 ```
-(no `ABLY_API_KEY`; the client polls `GET …/drops`), or
+(no `ABLY_API_KEY`; the client polls `GET …/drops`; `device: { id, label, kind }` is included here too), or
 
 ```json
 { "mode": "ably", "tokenRequest": { … }, "spaceIds": ["…"], "userChannel": "user:{id}",
@@ -216,6 +216,7 @@ Channel `user:{userId}`:
 
 | Method | Path | Body | Result |
 |--------|------|------|--------|
+| GET | `/api/usage` | — | `{ usage: { storageBytes, storageMaxBytes, spaces, spacesMax, devices, devicesMax } }` |
 | GET | `/api/devices` | — | `{ devices: DeviceDTO[] }` |
 | PATCH | `/api/devices/:id` | `{ label }` | `{ device }` |
 | DELETE | `/api/devices/:id` | — | Revokes the device: deletes its sessions and grants and publishes `device.revoked`. Returns `204`. |

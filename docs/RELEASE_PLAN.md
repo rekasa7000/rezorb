@@ -1,6 +1,6 @@
 # Rezorb: Release Plan
 
-Status: **v1 is built and tested locally; not deployed.** Written 2026-11-21.
+Status: **v1 is built and tested locally; not deployed.** Written 2026-11-21, updated 2026-11-27.
 
 This is what stands between the current code and a first public release, in priority order. It is based on a
 check of the repository (what exists, what does not), not on the roadmap's intentions. Related documents:
@@ -80,4 +80,18 @@ which is the number the whole business depends on.
 
 Accounts and device pairing, PIN-locked Spaces with lockout, text, image and file Drops, expiry, quotas,
 realtime with a polling fallback, the full design system with Calm mode and Daylight, a 3D hero, the logo set,
-and 14 end-to-end, 49 integration and 33 unit tests. See [ROADMAP.md](ROADMAP.md).
+and 22 end-to-end, 56 integration and 33 unit tests, plus password reset, a CI workflow, the "open on another device" QR, arrival signals and a usage meter (see section 8). See [ROADMAP.md](ROADMAP.md).
+
+## 8. Progress since this plan was written
+
+| Item | State |
+|------|-------|
+| A5 forgot/reset password | Done. Pages, dev-outbox integration tests (including an open-redirect check) and e2e. Resend-verification page is still open |
+| A8 CI | Written (`.github/workflows/ci.yml`: check, integration with a Postgres service, e2e). **Not yet run on GitHub**; treat it as unverified until the first run is green |
+| B1 open on another device | Done. QR and link carry the Space name, never the PIN; deep links survive sign-in (e2e for every signed-in page) |
+| B2 arrival signals | Done. Tab title shows a count while the tab is hidden; browser notification is opt-in per device and never contains Drop content |
+| B3 storage meter | Done. Settings, Limits shows storage, Spaces and devices against their limits; the quota error points there |
+
+Two bugs found on the way, both fixed: polling mode never learned which device it was, so arrivals from other
+devices were never announced; and the app layout's bare auth guard dropped the `next` link on deep links.
+Polling now also continues in a background tab (it relies on Ably once configured).

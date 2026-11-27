@@ -67,7 +67,7 @@ down the limiter fails open to the in-memory window rather than blocking everyon
 Set in `next.config.ts`: `X-Content-Type-Options: nosniff`, `Referrer-Policy:
 strict-origin-when-cross-origin`, `X-Frame-Options: DENY`, `Permissions-Policy` (camera,
 microphone, geolocation off; clipboard self), `Strict-Transport-Security` (2 years,
-preload). Tested
+preload). Better Auth's origin check is enabled explicitly (`disableOriginCheck: false`) because the library turns it off when `NODE_ENV` is `test`; an integration test proves a password-reset `redirectTo` on another origin gets 403. Tested
 
 **Open: Content-Security-Policy is not implemented.** The plan is a nonce-based policy
 (`script-src 'self' 'nonce-…' 'strict-dynamic'`, `connect-src` for the app, R2 and Ably,

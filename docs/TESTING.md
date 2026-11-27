@@ -27,8 +27,8 @@ traces off (`pnpm e2e` already passes `--trace off`).
 |-------|-------|------|-------|
 | Typecheck, lint | clean | | TS 5.9, ESLint 10 |
 | Unit | 33 tests / 5 files | < 1 s | PIN rules, lockout math, lifetimes, classifier, formatting, optimistic-cache logic |
-| Integration | 49 tests / 3 files | ~14 s | Route handlers called directly against real Postgres; a simulated `Device` = its own cookie jar and User-Agent |
-| E2E | 14 tests | ~75 s | Real Chromium, production build, two browser contexts = two devices; includes axe (WCAG 2.2 AA) in Dark **and** Daylight |
+| Integration | 56 tests / 5 files | ~18 s | Route handlers called directly against real Postgres; a simulated `Device` = its own cookie jar and User-Agent |
+| E2E | 22 tests | ~85 s | Real Chromium, production build, two browser contexts = two devices; includes axe (WCAG 2.2 AA) in Dark **and** Daylight |
 
 ## What the tests prove
 

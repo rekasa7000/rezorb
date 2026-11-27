@@ -1,7 +1,7 @@
 # Rezorb — Build Roadmap & Status
 
 Legend: **Done** = built and tested. **Unverified** = built, **not yet verified against the real service**.
-**Open** = not done. Last updated 2026-11-20.
+**Open** = not done. Last updated 2026-11-27.
 
 See also: [RELEASE_PLAN.md](RELEASE_PLAN.md) for the ordered list of what to build before release, and
 [MARKET.md](MARKET.md) for the market model behind that order.
@@ -26,7 +26,7 @@ See also: [RELEASE_PLAN.md](RELEASE_PLAN.md) for the ordered list of what to bui
 - Done: Legacy Vite + Express apps removed (commit `3c84314` keeps them).
 - Done: Next.js 16 at the repo root; TypeScript strict; ESLint; Vitest; Playwright; pnpm.
 - Done: `vercel.json` (build command, cron) and `.env.example`.
-- Open: GitHub Actions CI (typecheck → lint → unit → integration → e2e).
+- Done, unverified: GitHub Actions CI (`.github/workflows/ci.yml`); not yet run on GitHub.
 - Open: Vercel project + Neon/Upstash/R2/Ably/Resend linked ([DEPLOYMENT.md](DEPLOYMENT.md)).
 
 ## M1 · Design foundation
@@ -41,7 +41,8 @@ See also: [RELEASE_PLAN.md](RELEASE_PLAN.md) for the ordered list of what to bui
 - Done: **Pairing:** `/pair` (code + QR + polling) and `/link` (approve with requester details).
 - Done: One-time workplace notice per device.
 - Unverified: Email verification (required in production), magic link, passkeys: code and UI exist; need Resend and a real browser/WebAuthn run to verify.
-- Open: Breached-password check; password-reset UI (the server hook exists, no page yet).
+- Done: Forgot-password and reset-password pages (rate limited, revokes other sessions).
+- Open: Breached-password check; resend-verification page.
 
 ## M3 · Spaces & PIN
 - Done: Create / unlock / lock / rename / re-accent / change lifetime / change PIN / delete.
@@ -63,13 +64,14 @@ See also: [RELEASE_PLAN.md](RELEASE_PLAN.md) for the ordered list of what to bui
 ## M6 · Expiry, quotas & limits
 - Done: Read-time filter, opportunistic burn, `/api/cron/burn`, stale-upload cleanup, 500-drop cap, quota by SUM, Space delete purges blobs.
 - Unverified: Vercel Cron invocation itself, and the R2 lifecycle rule.
-- Open: Settings → per-Space storage meter (the Limits tab lists limits but doesn't show usage yet).
+- Done: Settings, Limits shows usage meters (storage, Spaces, devices) from `GET /api/usage`.
 
 ## M7 · Polish
 
 - Done: Landing, Launchpad, Space, auth screens, settings, 404, error boundary, OG image, favicon.
 - Done: Daylight theme, Calm mode, mobile layout (verified at 390 px: no horizontal overflow), axe clean in Dark and Daylight.
 - Done: Float view (opt-in, desktop), command palette, shortcut cheat-sheet.
+- Done: "Open on another device" QR and link; tab-title arrival count and opt-in notifications.
 - Done: Logo set (outlined SVG), editorial lockup, apple-touch icon, three.js landing hero ([DESIGN §16](../DESIGN.md#16-vogue-in-orbit-logo-art-direction-and-the-3d-hero)).
 - Open: Generated imagery (key art, textures, UI illustrations): prompts are ready in [ASSETS.md](ASSETS.md); the images themselves need generating and wiring in.
 - Open: Real-device passes (iOS Safari clipboard-image copy, Android file picker/camera).

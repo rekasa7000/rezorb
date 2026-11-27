@@ -13,7 +13,7 @@ no emailing yourself.
 - **Pair a device with a code or QR**, so you never type a password on a machine you don't trust.
 - A loud, maximalist space aesthetic with a **Calm mode** for the office, plus a Daylight theme.
 
-> **Status:** v1 is built and tested locally (33 unit, 49 integration, 14 end-to-end tests, axe-clean
+> **Status:** v1 is built and tested locally (33 unit, 56 integration, 22 end-to-end tests, axe-clean
 > in both themes). It has **not been deployed**, and Neon, R2, Ably, Resend and Upstash have not
 > been exercised for real. Read [docs/TESTING.md](docs/TESTING.md#not-verified) and
 > [docs/ROADMAP.md](docs/ROADMAP.md) before launching. **Don't launch without a CSP.**
