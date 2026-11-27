@@ -10,10 +10,12 @@ export interface Prefs {
   calm: boolean;
   view: View;
   noticeAccepted: boolean;
+  /** Opt-in: a browser notification (never the content) when something arrives while the tab is hidden. */
+  notify: boolean;
 }
 
 export const PREFS_KEY = "rz-prefs";
-const defaults: Prefs = { theme: "dark", calm: false, view: "grid", noticeAccepted: false };
+const defaults: Prefs = { theme: "dark", calm: false, view: "grid", noticeAccepted: false, notify: false };
 
 function load(): Prefs {
   try {
@@ -46,8 +48,8 @@ export const usePrefs = create<Store>((set, get) => ({
   },
   set: (patch) => {
     set(patch);
-    const { theme, calm, view, noticeAccepted } = get();
-    const next = { theme, calm, view, noticeAccepted };
+    const { theme, calm, view, noticeAccepted, notify } = get();
+    const next = { theme, calm, view, noticeAccepted, notify };
     apply(next);
     try {
       localStorage.setItem(PREFS_KEY, JSON.stringify(next));

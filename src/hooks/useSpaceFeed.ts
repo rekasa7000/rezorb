@@ -65,9 +65,10 @@ export function useSpaceFeed(initial: DropDTO[], opts: Opts) {
     initialData: initial,
     staleTime: 0,
     retry: false,
-    // Poll only when realtime isn't carrying us; stop once access is gone.
+    // Poll only when realtime isn't carrying us; stop once access is gone. Keep polling in a background tab: the
+    // tab-title count and opt-in notification depend on noticing arrivals there.
     refetchInterval: (q) => (q.state.status === "error" ? false : connection === "live" ? false : 2500),
-    refetchIntervalInBackground: false,
+    refetchIntervalInBackground: true,
   });
 
   const upsert = useCallback(
@@ -79,10 +80,11 @@ export function useSpaceFeed(initial: DropDTO[], opts: Opts) {
 
   // Announce arrivals from other devices (from either realtime or polling).
   useEffect(() => {
+    if (!me) return; // can't tell your own Drops from arrivals yet; don't mark anything as seen
     for (const d of query.data ?? []) {
       if (seen.current.has(d.id)) continue;
       seen.current.add(d.id);
-      if (d.status === "ready" && !d.id.startsWith("tmp_") && d.sourceDevice && d.sourceDevice.id !== me?.id && me) handlers.current.onArrived(d);
+      if (d.status === "ready" && !d.id.startsWith("tmp_") && d.sourceDevice && d.sourceDevice.id !== me.id) handlers.current.onArrived(d);
     }
   }, [query.data, me]);
 
