@@ -12,10 +12,10 @@ import type { SpaceDTO } from "@/lib/dto";
  * Launchpad: a utility screen, so it is composed like one. Entering a Space (the primary task) is on
  * the left; the Spaces you already have are a plain ruled list on the right, each led by its accent.
  */
-export function Launchpad({ initialSpaces }: { initialSpaces: SpaceDTO[] }) {
+export function Launchpad({ initialSpaces, initialName = "" }: { initialSpaces: SpaceDTO[]; initialName?: string }) {
   const router = useRouter();
   const [spaces] = useState(initialSpaces);
-  const [prefill, setPrefill] = useState("");
+  const [prefill, setPrefill] = useState(initialName);
   const [createOpen, setCreateOpen] = useState(false);
   const [formKey, setFormKey] = useState(0);
 
