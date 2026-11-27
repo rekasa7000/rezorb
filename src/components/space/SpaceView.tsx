@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { AnimatePresence } from "motion/react";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Clock, Lock, Moon, Settings, Sun, LayoutGrid, Orbit } from "lucide-react";
+import { ArrowLeft, Clock, Lock, Moon, Settings, Smartphone, Sun, LayoutGrid, Orbit } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/Button";
 import { Constellation } from "./Constellation";
@@ -14,11 +14,13 @@ import { CommandPalette, type PaletteAction } from "./CommandPalette";
 import { ShortcutsDialog } from "./Shortcuts";
 import { SpaceSettings } from "./SpaceSettings";
 import { Lightbox } from "./Lightbox";
+import { OpenOnOtherDevice } from "./OpenOnOtherDevice";
 import { dropsKey, useSpaceFeed } from "@/hooks/useSpaceFeed";
 import { useUploads } from "@/hooks/useUploads";
 import { usePasteAndDrop } from "@/hooks/usePasteAndDrop";
 import { api, ApiRequestError } from "@/lib/api-client";
 import { copyImageFromUrl, copyText, isEditable } from "@/lib/clipboard";
+import { showArrival } from "@/lib/notify";
 import { classifyText } from "@/lib/classify";
 import { isTmp, removeDrops, tmpTextDrop, upsertDrop } from "@/lib/drop-cache";
 import type { DropDTO } from "@/lib/dto";
@@ -40,12 +42,15 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
   const [arrivedIds, setArrivedIds] = useState<Set<string>>(new Set());
   const [paletteOpen, setPaletteOpen] = useState(false);
   const [helpOpen, setHelpOpen] = useState(false);
+  const [otherOpen, setOtherOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [lightbox, setLightbox] = useState<DropDTO | null>(null);
   const [pendingDeletes, setPendingDeletes] = useState<Set<string>>(new Set());
   const dockRef = useRef<HTMLTextAreaElement>(null);
   const live = useRef<HTMLParagraphElement>(null);
-  const { view, calm, theme, set } = usePrefs();
+  const { view, calm, theme, notify, set } = usePrefs();
+  const [unseen, setUnseen] = useState(0);
+  const baseTitle = useRef("");
 
   const goLocked = useCallback(() => {
     toast("This Space was locked.", { description: "Enter the PIN again to keep going." });
@@ -65,7 +70,13 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
       setArrivedIds((cur) => new Set(cur).add(d.id));
       setTimeout(() => setArrivedIds((cur) => (cur.delete(d.id), new Set(cur))), 1200);
       if (live.current) live.current.textContent = `New ${d.kind} from ${d.sourceDevice?.label ?? "another device"}`;
-      toast(`Docked from ${d.sourceDevice?.label ?? "another device"}.`);
+      // If you're in another tab you can't see the toast: count it in the tab title instead.
+      if (document.hidden) {
+        // Remember the real title the first time (the page sets it after we mount).
+        if (!/^\(\d+\) /.test(document.title)) baseTitle.current = document.title;
+        setUnseen((n) => n + 1);
+        if (notify) showArrival(space.name, d.sourceDevice?.label ?? "another device");
+      } else toast(`Docked from ${d.sourceDevice?.label ?? "another device"}.`);
     },
     onDeviceRevoked: () => {
       toast.error("This device was signed out.");
@@ -187,6 +198,20 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
     }
   }, [router, space.id]);
 
+  // ── Arrival signal in the tab title ─────────────────────────────
+  useEffect(() => {
+    const seen = () => !document.hidden && setUnseen(0);
+    document.addEventListener("visibilitychange", seen);
+    return () => {
+      document.removeEventListener("visibilitychange", seen);
+      if (baseTitle.current) document.title = baseTitle.current;
+    };
+  }, []);
+  useEffect(() => {
+    if (unseen > 0) document.title = `(${unseen}) ${space.name} · Rezorb`;
+    else if (baseTitle.current) document.title = baseTitle.current;
+  }, [unseen, space.name]);
+
   // ── Keyboard (DESIGN §11) ───────────────────────────────────────
   useEffect(() => {
     const cards = () => Array.from(document.querySelectorAll<HTMLElement>("[data-drop-card]"));
@@ -255,6 +280,7 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
     { id: "lock", label: "Lock this Space", hint: "Ctrl L", run: lock },
     { id: "calm", label: calm ? "Turn Calm mode off" : "Turn Calm mode on", hint: "⇧C", run: () => set({ calm: !calm }) },
     { id: "view", label: view === "grid" ? "Switch to Float view" : "Switch to Grid view", run: () => set({ view: view === "grid" ? "float" : "grid" }) },
+    { id: "other", label: "Open on another device", run: () => setOtherOpen(true) },
     { id: "settings", label: "Space settings", run: () => setSettingsOpen(true) },
     { id: "spaces", label: "Go to your Spaces", run: () => router.push("/spaces") },
     { id: "help", label: "Keyboard shortcuts", hint: "?", run: () => setHelpOpen(true) },
@@ -286,6 +312,9 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
             <Button variant="ghost" size="icon" aria-label={calm ? "Turn Calm mode off" : "Turn Calm mode on"} aria-pressed={calm} onClick={() => set({ calm: !calm })} className="hidden sm:inline-flex">
               {theme === "light" ? <Sun size={20} strokeWidth={1.75} /> : <Moon size={20} strokeWidth={1.75} />}
             </Button>
+            <Button variant="ghost" size="icon" aria-label="Open on another device" onClick={() => setOtherOpen(true)} data-testid="open-other-device" className="hidden sm:inline-flex">
+              <Smartphone size={20} strokeWidth={1.75} />
+            </Button>
             <Button variant="ghost" size="icon" aria-label="Space settings" onClick={() => setSettingsOpen(true)} data-testid="space-settings">
               <Settings size={20} strokeWidth={1.75} />
             </Button>
@@ -305,6 +334,9 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
               Paste with <kbd className="font-mono-cargo rounded-sm border border-line px-1.5 py-0.5 text-sm text-starlight">Ctrl/⌘ V</kbd>, drop a file anywhere, or type
               below. It shows up on your other devices as soon as they are in this Space.
             </p>
+            <Button variant="secondary" className="mt-6" onClick={() => setOtherOpen(true)} data-testid="empty-open-other-device">
+              <Smartphone size={16} aria-hidden /> Open on your other device
+            </Button>
           </div>
         ) : (
           <div
@@ -335,6 +367,7 @@ export function SpaceView({ space: initialSpace, initialDrops }: { space: SpaceI
       <Lightbox drop={lightbox} onClose={() => setLightbox(null)} onDownload={actions.download} />
       <CommandPalette open={paletteOpen} onClose={() => setPaletteOpen(false)} actions={palette} />
       <ShortcutsDialog open={helpOpen} onClose={() => setHelpOpen(false)} />
+      <OpenOnOtherDevice open={otherOpen} onClose={() => setOtherOpen(false)} spaceName={space.name} />
       {settingsOpen && (
         <SpaceSettings
           open
