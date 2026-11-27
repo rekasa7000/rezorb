@@ -136,7 +136,7 @@ export async function createTextDrop(opts: {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${opts.userId}))`);
     const used = await storageUsed(opts.userId, tx);
     if (used + bytes > LIMITS.maxStorageBytes) {
-      throw E.forbidden("QUOTA_STORAGE", "You're out of space in orbit. Delete something or wait for it to expire.");
+      throw E.forbidden("QUOTA_STORAGE", "You're out of space in orbit (1 GB). Delete some Drops or wait for them to expire. Settings > Limits shows what you're using.");
     }
     const now = new Date();
     const [row] = await tx
@@ -193,7 +193,7 @@ export async function startUpload(opts: {
     await tx.execute(sql`select pg_advisory_xact_lock(hashtext(${opts.userId}))`);
     const used = await storageUsed(opts.userId, tx);
     if (used + opts.sizeBytes + thumbReserve > LIMITS.maxStorageBytes) {
-      throw E.forbidden("QUOTA_STORAGE", "You're out of space in orbit. Delete something or wait for it to expire.");
+      throw E.forbidden("QUOTA_STORAGE", "You're out of space in orbit (1 GB). Delete some Drops or wait for them to expire. Settings > Limits shows what you're using.");
     }
     const now = new Date();
     const [row] = await tx

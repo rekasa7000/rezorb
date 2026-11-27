@@ -8,8 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { api, ApiRequestError } from "@/lib/api-client";
 import { authClient } from "@/lib/auth-client";
-import type { DeviceDTO } from "@/lib/dto";
-import { relativeTime } from "@/lib/format";
+import type { DeviceDTO, UsageDTO } from "@/lib/dto";
+import { enableNotifications, notificationsSupported } from "@/lib/notify";
+import { formatBytes, relativeTime } from "@/lib/format";
 import { usePrefs, type Theme } from "@/stores/prefs";
 import { cn } from "@/lib/cn";
 
@@ -134,7 +135,7 @@ function DevicesTab() {
 }
 
 function AppearanceTab() {
-  const { theme, calm, view, set } = usePrefs();
+  const { theme, calm, view, notify, set } = usePrefs();
   const themes: Theme[] = ["dark", "light", "system"];
   return (
     <div className="space-y-8">
@@ -156,6 +157,26 @@ function AppearanceTab() {
           <span className="text-sm text-moondust">Strips the stars, glow and motion. The same app, quieter. Good for a work laptop.</span>
         </span>
       </label>
+      {notificationsSupported() && (
+        <label className="flex cursor-pointer items-start gap-4">
+          <input
+            type="checkbox"
+            data-testid="notify-toggle"
+            checked={notify}
+            onChange={async (e) => {
+              if (!e.target.checked) return set({ notify: false });
+              const granted = await enableNotifications();
+              set({ notify: granted });
+              if (!granted) toast.error("Notifications are blocked for this site in your browser settings.");
+            }}
+            className="mt-1 size-5 accent-[var(--nebula)]"
+          />
+          <span>
+            <span className="block font-bold">Notify me when something arrives</span>
+            <span className="text-sm text-moondust">Only while this tab is in the background. The notification names the Space and the device, never the content.</span>
+          </span>
+        </label>
+      )}
       <fieldset>
         <legend className="fs-micro mb-2 text-moondust">Space layout</legend>
         <div className="flex gap-2">
@@ -166,6 +187,33 @@ function AppearanceTab() {
           ))}
         </div>
       </fieldset>
+    </div>
+  );
+}
+
+function Meter({ label, used, max, text, testId }: { label: string; used: number; max: number; text: string; testId: string }) {
+  const pct = Math.min(100, Math.round((used / max) * 100));
+  return (
+    <div data-testid={testId}>
+      <div className="mb-1 flex justify-between gap-4 text-sm"><span className="font-bold">{label}</span><span className="text-moondust">{text}</span></div>
+      <div role="meter" aria-label={label} aria-valuemin={0} aria-valuemax={max} aria-valuenow={used} className="h-3 border-2 border-line bg-hull">
+        <div className={cn("h-full", pct >= 90 ? "bg-red-600" : "bg-nebula")} style={{ width: `${pct}%` }} />
+      </div>
+    </div>
+  );
+}
+
+function UsageMeters() {
+  const [u, setU] = useState<UsageDTO | null>(null);
+  useEffect(() => void api<{ usage: UsageDTO }>("/api/usage").then((r) => setU(r.usage)).catch(() => setU(null)), []);
+  if (!u) return null;
+  const left = Math.max(0, u.storageMaxBytes - u.storageBytes);
+  return (
+    <div className="mb-8 space-y-5">
+      <Meter testId="meter-storage" label="Total in orbit" used={u.storageBytes} max={u.storageMaxBytes} text={`${formatBytes(u.storageBytes)} of ${formatBytes(u.storageMaxBytes)} used, ${formatBytes(left)} left`} />
+      <Meter testId="meter-spaces" label="Spaces" used={u.spaces} max={u.spacesMax} text={`${u.spaces} of ${u.spacesMax}`} />
+      <Meter testId="meter-devices" label="Devices" used={u.devices} max={u.devicesMax} text={`${u.devices} of ${u.devicesMax}`} />
+      {left < u.storageMaxBytes * 0.1 && <p className="text-sm text-moondust">Nearly full. Delete large Drops, or wait: everything burns up on its own schedule.</p>}
     </div>
   );
 }
@@ -181,10 +229,13 @@ function LimitsTab() {
     ["Devices", "Up to 10"],
   ];
   return (
-    <dl className="divide-y divide-line">
-      {rows.map(([k, v]) => (
-        <div key={k} className="flex justify-between gap-4 py-3"><dt className="text-moondust">{k}</dt><dd className="font-bold">{v}</dd></div>
-      ))}
-    </dl>
+    <>
+      <UsageMeters />
+      <dl className="divide-y divide-line">
+        {rows.map(([k, v]) => (
+          <div key={k} className="flex justify-between gap-4 py-3"><dt className="text-moondust">{k}</dt><dd className="font-bold">{v}</dd></div>
+        ))}
+      </dl>
+    </>
   );
 }

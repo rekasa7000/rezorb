@@ -55,3 +55,12 @@ export type RealtimeEvent =
   | { name: "space.relocked"; data: { pinVersion: number; byDeviceId: string } }
   | { name: "space.deleted"; data: Record<string, never> }
   | { name: "space.sealed"; data: { until: string } };
+
+export interface UsageDTO {
+  storageBytes: number;
+  storageMaxBytes: number;
+  spaces: number;
+  spacesMax: number;
+  devices: number;
+  devicesMax: number;
+}
