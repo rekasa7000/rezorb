@@ -26,6 +26,9 @@ function build() {
       database: { generateId: "uuid" },
       useSecureCookies: isProd(),
       ipAddress: { ipAddressHeaders: ["x-vercel-forwarded-for", "x-forwarded-for"] },
+      // Explicit, because Better Auth turns origin checks off when NODE_ENV is "test", which would
+      // hide an open-redirect or CSRF regression from the test suite.
+      disableOriginCheck: false,
     },
     // Better Auth's own limiter for its endpoints (our API routes use ratelimit.ts).
     // Database storage so limits hold across serverless instances. Off only in the
@@ -39,6 +42,7 @@ function build() {
         "/sign-in/email": { window: 10, max: 10 },
         "/sign-up/email": { window: 60, max: 10 },
         "/sign-in/magic-link": { window: 60, max: 5 },
+        "/request-password-reset": { window: 60, max: 5 },
         "/pairing/start": false,
       },
     },
@@ -50,6 +54,9 @@ function build() {
       // production a missing RESEND_API_KEY makes sign-up fail loudly instead.
       requireEmailVerification: emailEnabled() || isProd(),
       sendResetPassword: async ({ user, url }) => sendMail(mails.reset(user.email, url)),
+      // A reset means "I may have lost control": every existing session is signed out.
+      revokeSessionsOnPasswordReset: true,
+      resetPasswordTokenExpiresIn: 60 * 60,
     },
     emailVerification: {
       sendOnSignUp: true,

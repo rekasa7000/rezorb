@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/Button";
 import { Field, Input } from "@/components/ui/Input";
 import { authClient } from "@/lib/auth-client";
 
-export function SignInForm({ next, urlError }: { next: string; urlError?: string }) {
+export function SignInForm({ next, urlError, justReset }: { next: string; urlError?: string; justReset?: boolean }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -79,6 +79,16 @@ export function SignInForm({ next, urlError }: { next: string; urlError?: string
         <Field label="Password">
           {(p) => <Input {...p} type="password" autoComplete="current-password webauthn" value={password} onChange={(e) => setPassword(e.target.value)} />}
         </Field>
+        <p className="-mt-2 text-sm">
+          <Link href="/forgot-password" className="text-moondust underline decoration-line underline-offset-4 hover:text-starlight">
+            Forgot your password?
+          </Link>
+        </p>
+        {justReset && (
+          <p role="status" className="rounded-md border border-aurora bg-aurora/10 px-3 py-2 text-sm text-aurora">
+            Password changed. Sign in with the new one.
+          </p>
+        )}
         {error && (
           <p role="alert" className="rounded-md border border-redshift/50 bg-redshift/10 px-3 py-2 text-sm text-redshift">
             {error}{" "}
